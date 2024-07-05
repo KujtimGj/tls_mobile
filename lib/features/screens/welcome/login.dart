@@ -1,15 +1,44 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_styled_toast/flutter_styled_toast.dart';
+import 'package:tls/features/controllers/login_controller.dart';
 import 'package:tls/features/screens/home/home.dart';
 import 'package:tls/main.dart';
 
 import '../../../core/dimensions.dart';
 
-class Login extends StatelessWidget {
+class Login extends StatefulWidget {
   const Login({super.key});
 
   @override
+  State<Login> createState() => _LoginState();
+}
+
+class _LoginState extends State<Login> {
+  final TextEditingController _email = TextEditingController();
+  final TextEditingController _password = TextEditingController();
+
+
+
+  login() async {
+    if(_email.text.isEmpty || _password.text.isEmpty){
+      showToast("Please complete all fields",context: context,curve: Curves.easeOut);
+    }
+    else {
+      LoginController loginController = LoginController();
+      var data = await loginController.signIn(context, _email.text, _password.text);
+      data.fold((left){
+        if(left.props.isNotEmpty){
+          showToast(left.props.first.toString());
+        }
+      }, (right){
+
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    
+
     return Scaffold(
         body: Padding(
           padding: EdgeInsets.symmetric(horizontal: getPhoneWitdth(context) * 0.08),
@@ -36,6 +65,7 @@ class Login extends StatelessWidget {
               SizedBox(
                 height: 60,
                 child: TextFormField(
+                  controller: _email,
                   decoration:  InputDecoration(
                     hintText: "user@email.com",
                     border: OutlineInputBorder(
@@ -53,6 +83,7 @@ class Login extends StatelessWidget {
               SizedBox(
                 height: 60,
                 child: TextFormField(
+                  controller: _password,
                   decoration: InputDecoration(
                     hintText: "*******",
                     border: OutlineInputBorder(
@@ -66,10 +97,8 @@ class Login extends StatelessWidget {
               ),
               GestureDetector(
                 onTap: () {
-                  Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(builder: (_) => const Base()),
-                          (route) => false);
+                  login();
+
                 },
                 child: Container(
                   height: getPhoneHeight(context) * 0.07,
