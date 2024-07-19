@@ -21,11 +21,9 @@ class TicketControllers {
     var ticketProvider = Provider.of<TicketProvider>(context, listen: false);
     Uri url = Uri.parse("$host$pendingTicketsRoute");
     requestHeaders['userID'] = userProvider.getUser()!.id;
-    try {
+
       var response = await http.get(url, headers: requestHeaders);
-
       if (response.statusCode == 200) {
-
         var body = jsonDecode(response.body);
 
 
@@ -39,9 +37,6 @@ class TicketControllers {
       } else {
         return Left(ServerFailure());
       }
-    } catch (e) {
-      print(e);
-      return Left(ServerFailure());
-    }
+
   }
 }

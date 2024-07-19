@@ -24,6 +24,7 @@ class _LoginState extends State<Login> {
       showToast("Please complete all fields",context: context,curve: Curves.easeOut);
     }
     else {
+
       LoginController loginController = LoginController();
       var data = await loginController.signIn(context, _email.text, _password.text);
       data.fold((left){

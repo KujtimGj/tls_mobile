@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tls/core/dimensions.dart';
 import 'package:tls/features/controllers/ticket_controllers.dart';
 import 'package:tls/features/models/ticket_model.dart';
 import 'package:tls/features/providers/ticket_provider.dart';
-import 'package:tls/features/providers/user_provider.dart';
 import 'package:tls/features/screens/home/task_details.dart';
 
 class Home extends StatefulWidget {
@@ -31,7 +29,7 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    var ticketProvider = Provider.of<TicketProvider>(context,listen: false);
+    var ticketProvider = Provider.of<TicketProvider>(context);
     Size size = MediaQuery.of(context).size;
     print(ticketProvider.getPendingTickets().length,);
     return Scaffold(

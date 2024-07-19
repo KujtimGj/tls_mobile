@@ -128,6 +128,8 @@ class TicketData {
   });
 
   factory TicketData.fromJson(Map<String, dynamic> json) {
+
+    List<Product> servicesList = json['product'] == null ? []:(json['product'] as List).map((e) => Product.fromJson(e)).toList();
     return TicketData(
       id: json['id'],
       manufacturer: json['manufacturer'],
@@ -137,9 +139,7 @@ class TicketData {
       appointmentDate: json['appointment_date'],
       servicePrice: json['service_price'],
       problemDescription: json['problem_description'],
-      product: List<Product>.from(
-        json['product'].map((item) => Product.fromJson(item)),
-      ),
+      product: servicesList,
       hasDiscount: json['has_discount'],
       discountPrice: json['discount_price'],
     );
