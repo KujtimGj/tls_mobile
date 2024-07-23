@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tls/features/providers/processing_tickets_provider.dart';
 import 'package:tls/features/providers/ticket_provider.dart';
 import 'package:tls/features/providers/user_provider.dart';
 import 'package:tls/features/screens/calendar/calendar.dart';
@@ -12,6 +13,7 @@ void main() {
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (_) => UserProvider()),
     ChangeNotifierProvider(create: (_) => TicketProvider()),
+    ChangeNotifierProvider(create: (_) => ProcessingTicketsProvider()),
   ],child: const MyApp(),));
 }
 

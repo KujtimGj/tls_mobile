@@ -6,13 +6,13 @@ class UserModel {
   String phoneNumber;
   String email;
   String role;
-  Company company;
+  Company? company;
   bool active;
   bool deleted;
   String createdAt;
   String updatedAt;
   int v;
-  Employee employee;
+  Employee? employee;
 
   UserModel({
     required this.id,
@@ -28,7 +28,7 @@ class UserModel {
     required this.createdAt,
     required this.updatedAt,
     required this.v,
-    required this.employee,
+      this.employee,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -36,17 +36,17 @@ class UserModel {
       id: json['_id'],
       fullname: json['fullname'],
       username: json['username'],
-      birthdate: json['birthdate'],
+      birthdate: json['birthdate'] ?? "",
       phoneNumber: json['phone_number'],
       email: json['email'],
       role: json['role'],
-      company: Company.fromJson(json['company']),
+      company: json['company'].runtimeType == String? Company(id: json['company']): Company.fromJson(json['company']),
       active: json['active'],
       deleted: json['deleted'],
       createdAt: json['createdAt'],
       updatedAt: json['updatedAt'],
       v: json['__v'],
-      employee: Employee.fromJson(json['employee']),
+      employee:json['employee'] == null ? null: Employee.fromJson(json['employee']),
     );
   }
 
@@ -59,30 +59,30 @@ class UserModel {
       'phone_number': phoneNumber,
       'email': email,
       'role': role,
-      'company': company.toJson(),
+      'company': company!.toJson(),
       'active': active,
       'deleted': deleted,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
       '__v': v,
-      'employee': employee.toJson(),
+      'employee': employee!.toJson(),
     };
   }
 }
 
 class Company {
   String id;
-  String clientCompanyName;
-  String createdAt;
-  String updatedAt;
-  int v;
+  String? clientCompanyName;
+  String? createdAt;
+  String? updatedAt;
+  int? v;
 
   Company({
     required this.id,
-    required this.clientCompanyName,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.v,
+      this.clientCompanyName,
+      this.createdAt,
+      this.updatedAt,
+      this.v,
   });
 
   factory Company.fromJson(Map<String, dynamic> json) {

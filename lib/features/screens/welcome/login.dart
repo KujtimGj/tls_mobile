@@ -17,22 +17,23 @@ class _LoginState extends State<Login> {
   final TextEditingController _email = TextEditingController();
   final TextEditingController _password = TextEditingController();
 
-
+  bool loging = false;
 
   login() async {
     if(_email.text.isEmpty || _password.text.isEmpty){
       showToast("Please complete all fields",context: context,curve: Curves.easeOut);
     }
     else {
-
+      setState(() => loging = true);
       LoginController loginController = LoginController();
       var data = await loginController.signIn(context, _email.text, _password.text);
       data.fold((left){
+        setState(() => loging = false);
         if(left.props.isNotEmpty){
           showToast(left.props.first.toString());
         }
       }, (right){
-
+        setState(() => loging = false);
       });
     }
   }

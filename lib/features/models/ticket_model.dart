@@ -1,6 +1,8 @@
+import 'package:intl/intl.dart';
 import 'package:tls/features/models/client_model.dart';
 import 'package:tls/features/models/product_model.dart';
 import 'package:tls/features/models/service_company.dart';
+import 'package:tls/features/models/user_model.dart';
 
 class TicketModel {
   String? id;
@@ -15,7 +17,7 @@ class TicketModel {
   bool? hasDiscount;
   List<dynamic>? imagesBefore;
   List<dynamic>? imagesAfter;
-  List<String>? technicians;
+  List<dynamic>? technicians;
   bool? completed;
   bool? deleted;
   String? createdAt;
@@ -62,7 +64,7 @@ class TicketModel {
       hasDiscount: json['has_discount'],
       imagesBefore: List<dynamic>.from(json['images_before']),
       imagesAfter: List<dynamic>.from(json['images_after']),
-      technicians: List<String>.from(json['technicians']),
+      technicians: json['technicians'],
       completed: json['completed'],
       deleted: json['deleted'],
       createdAt: json['createdAt'],
@@ -136,7 +138,7 @@ class TicketData {
       serviceModel: json['service_model'],
       serialNumber: json['serial_number'],
       buyDate: json['buy_date'],
-      appointmentDate: json['appointment_date'],
+      appointmentDate: json['appointment_data'],
       servicePrice: json['service_price'],
       problemDescription: json['problem_description'],
       product: servicesList,
@@ -159,6 +161,14 @@ class TicketData {
       'has_discount': hasDiscount,
       'discount_price': discountPrice,
     };
+  }
+
+  parseDate(){
+    try{
+      return DateFormat("yyyy-MM-dd HH:mm").format(DateTime.parse(appointmentDate!));
+    }catch(e){
+      return "Uncorrect date format";
+    }
   }
 }
 

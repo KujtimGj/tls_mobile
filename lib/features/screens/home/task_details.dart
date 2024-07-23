@@ -1,19 +1,77 @@
 import 'package:flutter/material.dart';
-import 'package:tls/features/screens/home/task_start.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
+import 'package:tls/core/dimensions.dart';
+import 'package:tls/core/utils.dart';
+import 'package:tls/features/controllers/ticket_controllers.dart';
+import 'package:tls/features/models/ticket_model.dart';
+import 'package:tls/features/providers/processing_tickets_provider.dart';
+import 'package:tls/features/providers/ticket_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class TaskDetails extends StatefulWidget {
-  const TaskDetails({super.key});
+  final TicketModel? ticketModel;
+  const TaskDetails({super.key, required this.ticketModel});
 
   @override
   State<TaskDetails> createState() => _TaskDetailsState();
 }
 
 class _TaskDetailsState extends State<TaskDetails> {
+
+  bool loading = false;
+
+
+  acceptTicket() async {
+    setState(() => loading = true);
+    var provider = Provider.of<ProcessingTicketsProvider>(context,listen: false);
+    TicketControllers ticketControllers = TicketControllers();
+    var res = await ticketControllers.ticketOnProcess(context, widget.ticketModel!.id!);
+    res.fold((failure){
+      setState(() => loading = false);
+    }, (tickets){
+      setState(() => loading = false);
+      provider.addTicket(widget.ticketModel!);
+      Navigator.pop(context);
+      Fluttertoast.showToast(msg: "Ticket is in process!");
+    });
+  }
+
+  rejectTicket(){
+    showModalBottomSheet(context: context, builder: (context){
+      return Container(
+        width: getPhoneWitdth(context),
+        padding: EdgeInsets.symmetric(vertical: 10),
+        color: Colors.white,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Text("Comment here",style: TextStyle(fontSize: 17),),
+              TextField(
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                  enabledBorder: OutlineInputBorder(
+
+                  )
+                ),
+              )
+            ],
+          ),
+        ),
+      );
+    });
+  }
+  returnTicket(){}
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        surfaceTintColor: Colors.white,
+        foregroundColor: Colors.black,
+        backgroundColor: Colors.white,
         leading: GestureDetector(
             onTap: () {
               Navigator.pop(context);
@@ -22,30 +80,94 @@ class _TaskDetailsState extends State<TaskDetails> {
               Icons.arrow_back,
               size: 25,
             )),
+        title: Text("Ticket: ${widget.ticketModel!.ticketNumber ?? ""}"),
+        centerTitle: true,
+        actions: [
+          GestureDetector(
+            onTap: () async {
+              if (widget.ticketModel!.client!.latitude.isEmpty ||
+                  widget.ticketModel!.client!.longitude.isEmpty) {
+                Fluttertoast.showToast(
+                    msg: "Latitude or longditute is missing!");
+              } else {
+                try {
+                  var url = getMapDirectionUrl(
+                      widget.ticketModel!.client!.latitude,
+                      widget.ticketModel!.client!.longitude);
+                  if (!await launchUrl(url)) {
+                    throw Exception('Could not launch $url');
+                  }
+                } catch (e) {
+                }
+              }
+            },
+            child: Container(
+              width: 50,
+              height: 50,
+              color: Colors.transparent,
+              child: const Icon(Icons.location_on_outlined),
+            ),
+          ),
+          const SizedBox(width: 10,)
+        ],
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: ListView(
+          physics: const ClampingScrollPhysics(),
           children: [
             const Text(
-              "Televisions to fix",
-              style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
+              "Company",
+              style: TextStyle(),
+        ),
             Text(
-              "Troubleshoot and fix the poor television reception in the living room.\n\nCheck cable connections, inspect the antenna for damage, and test alternate sources to isolate the problem. Realign or replace cables as needed, adjust the antenna position for better signal reception, and ensure all channels are accessible. Document the process and communicate findings to the homeowner, suggesting further action if necessary.",
-              style: TextStyle(
-                color: Colors.grey[500],
+              widget.ticketModel!.serviceCompany!.companyName,
+              style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+            ),
+            const Divider(height: 20,thickness: 0.6,),
+            const Text(
+              "Problem description",
+              style: TextStyle(),
+            ),
+            const SizedBox(height: 4,),
+            Text(
+              "${widget.ticketModel!.data!.problemDescription}",
+              style: const TextStyle(
+                fontSize: 19,height: 1.2
               ),
             ),
-            const SizedBox(height: 15),
+            const Divider(height: 20,thickness: 0.6,),
+            const Text(
+              "Address",
+            ),
+            const SizedBox(
+              height: 5,
+            ),
             Text(
-              "Address,18 Nurnberg",
-              style: TextStyle(
-                color: Colors.black,
+              widget.ticketModel!.client!.address,
+              style: const TextStyle(
+
+                  fontSize: 19,height: 1.2
               ),
             ),
-            const SizedBox(height: 15),
+            const Divider(height: 20,thickness: 0.6,),
+
+            const Text(
+              "Team Members",
+
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children:
+                  List.generate(widget.ticketModel!.technicians!.length, (i) {
+                var technician = widget.ticketModel!.technicians![i];
+                return Text(
+                  "${technician['fullname']}",
+                  style: const TextStyle(   fontSize: 19,height: 1.2),
+                );
+              }),
+            ),
+            const SizedBox(height: 25),
 
             const Text(
               "Deadline",
@@ -61,9 +183,12 @@ class _TaskDetailsState extends State<TaskDetails> {
                       size: 25,
                       color: Colors.grey[500],
                     ),
-                    const Text(
-                      " Deadline: 5 April",
-                      style: TextStyle(fontSize: 16),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Text(
+                      widget.ticketModel!.data!.parseDate() ?? "",
+                      style: const TextStyle(fontSize: 16, color: Colors.black),
                     )
                   ],
                 ),
@@ -72,9 +197,9 @@ class _TaskDetailsState extends State<TaskDetails> {
                   decoration: BoxDecoration(
                       color: const Color(0xffe8ffeb),
                       borderRadius: BorderRadius.circular(10)),
-                  child: const Text(
-                    "On Progress",
-                    style: TextStyle(
+                  child: Text(
+                    statusText(),
+                    style: const TextStyle(
                         color: Color(0xff58dc6b),
                         fontWeight: FontWeight.w600,
                         fontSize: 16),
@@ -83,184 +208,123 @@ class _TaskDetailsState extends State<TaskDetails> {
               ],
             ),
             const SizedBox(height: 25),
-            const Text(
-              "Team Members",
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w500),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                Image.network(
-                  "https://www.freelanceri-ks.com/static/media/5.6b92b8441c1a7c558218.png",
-                  height: 50,
-                ),
-                const SizedBox(width: 10),
-                Image.network(
-                  "https://www.freelanceri-ks.com/static/media/4.97aa07241f899d4be54d.jpg",
-                  height: 50,
-                ),
-                const SizedBox(width: 10),
-                Image.network(
-                  "https://www.freelanceri-ks.com/static/media/3.7ee4c4764f6fb00e2fc1.png",
-                  height: 50,
-                ),
-                const SizedBox(width: 10),
-                Container(
-                  height: 50,
-                  width: 50,
-                  decoration: BoxDecoration(
-                      shape: BoxShape.circle, color: Colors.grey[300]),
-                  child: const Center(
-                    child: Icon(Icons.add),
-                  ),
-                )
-              ],
-            ),
-            const SizedBox(height: 25),
-            const Text(
-              "Subtasks",
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w500),
-            ),
-            Container(
-              margin: const EdgeInsets.only(top: 10),
-              height: 80,
-              width: size.width,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: Colors.grey[200]),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Checkbox(
-                      value: false,
-                      fillColor: MaterialStateProperty.resolveWith<Color>(
-                        (Set<MaterialState> states) {
-                          if (states.contains(MaterialState.selected)) {
-                            return const Color(
-                                0xff58dc6b); // The color when checkbox is selected
-                          }
-                          return Colors.transparent; // Use the default color
-                        },
-                      ),
-                      onChanged: (value) {
-                        setState(() {
-                          value = false;
-                        });
-                      }),
-                  const SizedBox(width: 10),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text(
-                        "Task one test",
-                        style: TextStyle(fontSize: 20),
-                      ),
-                      Text(
-                        "by Employee",
-                        style: TextStyle(color: Colors.grey[400]),
-                      )
-                    ],
-                  )
-                ],
-              ),
-            ),
-            Container(
-              margin: const EdgeInsets.only(top: 10),
-              height: 80,
-              width: size.width,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: Colors.grey[200]),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Checkbox(
-                      value: false,
-                      fillColor: MaterialStateProperty.resolveWith<Color>(
-                        (Set<MaterialState> states) {
-                          if (states.contains(MaterialState.selected)) {
-                            return const Color(
-                                0xff58dc6b); // The color when checkbox is selected
-                          }
-                          return Colors.transparent; // Use the default color
-                        },
-                      ),
-                      onChanged: (value) {
-                        setState(() {
-                          value = false;
-                        });
-                      }),
-                  const SizedBox(width: 10),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text(
-                        "Task one test",
-                        style: TextStyle(fontSize: 20),
-                      ),
-                      Text(
-                        "by Employee",
-                        style: TextStyle(color: Colors.grey[400]),
-                      )
-                    ],
-                  )
-                ],
-              ),
-            ),
-            const SizedBox(height: 25),
-            Row(
-              children: [
-                Expanded(
-                  flex: 2,
-                  child: Container(
-                    height: 55,
-                    margin: const EdgeInsets.all(5),
-                    width: size.width * 0.8,
-                    decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        borderRadius: BorderRadius.circular(10)),
-                    child: const Center(
-                      child: Text(
-                        "Get Location",
-                        style:
-                            TextStyle(color: Color(0xff363636), fontSize: 18),
-                      ),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  flex: 2,
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => const StartedTicket()));
-                    },
-                    child: Container(
-                      height: 55,
-                      margin: const EdgeInsets.all(5),
-                      width: size.width * 0.8,
-                      decoration: BoxDecoration(
-                          color: const Color(0xff58dc6b),
-                          borderRadius: BorderRadius.circular(10)),
-                      child: const Center(
-                        child: Text(
-                          "Start ticket",
-                          style: TextStyle(color: Colors.white, fontSize: 18),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+           nextButton(size),
             const SizedBox(height: 25),
           ],
         ),
       ),
     );
+  }
+
+  statusText(){
+    if(widget.ticketModel!.status == "pending"){
+      return "On Progress";
+    }
+    else if(widget.ticketModel!.status == "processing"){
+      return "On Processing";
+    }
+  }
+  nextButton(size){
+    if(widget.ticketModel!.status == "pending"){
+      return  GestureDetector(
+        onTap: () {
+          rejectTicket();
+          // Navigator.push(
+          //     context,
+          //     MaterialPageRoute(
+          //         builder: (_) => const StartedTicket()));
+        },
+        child: Container(
+          height: 51,
+          width: size.width * 0.8,
+          decoration: BoxDecoration(
+              color: const Color(0xff58dc6b),
+              borderRadius: BorderRadius.circular(10)),
+          child:   Center(
+            child: loading ? const CircularProgressIndicator(strokeWidth: 1.8,color: Colors.white,):const Text(
+              "Start ticket",
+              style: TextStyle(color: Colors.white, fontSize: 18),
+            ),
+          ),
+        ),
+      );
+    }
+    else{
+      return  Row(
+        children: [
+          Expanded(
+            child: GestureDetector(
+              onTap: () {
+                rejectTicket();
+                // Navigator.push(
+                //     context,
+                //     MaterialPageRoute(
+                //         builder: (_) => const StartedTicket()));
+              },
+              child: Container(
+                height: 49,
+                decoration: BoxDecoration(
+                    color: const Color(0xffe73d4f),
+                    borderRadius: BorderRadius.circular(10)),
+                child:   Center(
+                  child: loading ? const CircularProgressIndicator(strokeWidth: 1.8,color: Colors.white,):const Text(
+                    "Reject",
+                    style: TextStyle(color: Colors.white, fontSize: 18),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 10,),
+          Expanded(
+            child: GestureDetector(
+              onTap: () {
+                returnTicket();
+                // Navigator.push(
+                //     context,
+                //     MaterialPageRoute(
+                //         builder: (_) => const StartedTicket()));
+              },
+              child: Container(
+                height: 49,
+                decoration: BoxDecoration(
+                    color:   const Color(0xff357ee5),
+                    borderRadius: BorderRadius.circular(10)),
+                child:   Center(
+                  child: loading ? const CircularProgressIndicator(strokeWidth: 1.8,color: Colors.white,):const Text(
+                    "Return",
+                    style: TextStyle(color: Colors.white, fontSize: 18),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 10,),
+          Expanded(
+            child: GestureDetector(
+              onTap: () {
+                acceptTicket();
+                // Navigator.push(
+                //     context,
+                //     MaterialPageRoute(
+                //         builder: (_) => const StartedTicket()));
+              },
+              child: Container(
+                height: 49,
+                decoration: BoxDecoration(
+                    color:   const Color(0xff156443),
+                    borderRadius: BorderRadius.circular(10)),
+                child:   Center(
+                  child: loading ? const CircularProgressIndicator(strokeWidth: 1.8,color: Colors.white,):const Text(
+                    "Complete",
+                    style: TextStyle(color: Colors.white, fontSize: 18),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
   }
 }

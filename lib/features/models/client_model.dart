@@ -1,48 +1,67 @@
+import 'package:tls/features/models/user_model.dart';
 
 class Client {
   String id;
-  String fullname;
-  String username;
-  String phoneNumber;
-  String email;
-  String createdAt;
-  String updatedAt;
-  int v;
+  UserModel? user;
+  String city;
+  String state;
+  String address;
+  String latitude;
+  String longitude;
+  String description;
+  bool active;
+  String company;
+  DateTime createdAt;
+  DateTime updatedAt;
 
   Client({
     required this.id,
-    required this.fullname,
-    required this.username,
-    required this.phoneNumber,
-    required this.email,
+    required this.user,
+    this.city = '',
+    this.state = '',
+    required this.address,
+    this.latitude = '',
+    this.longitude = '',
+    this.description = '',
+    this.active = true,
+    required this.company,
     required this.createdAt,
     required this.updatedAt,
-    required this.v,
   });
 
+  // Constructor to create a Client from JSON
   factory Client.fromJson(Map<String, dynamic> json) {
     return Client(
       id: json['_id'],
-      fullname: json['fullname'],
-      username: json['username'],
-      phoneNumber: json['phone_number'],
-      email: json['email'],
-      createdAt: json['createdAt'],
-      updatedAt: json['updatedAt'],
-      v: json['__v'],
+      user: UserModel.fromJson(json['user']),
+      city: json['city'] ?? '',
+      state: json['state'] ?? '',
+      address: json['address'],
+      latitude: json['latitude'] ?? '',
+      longitude: json['longitude'] ?? '',
+      description: json['description'] ?? '',
+      active: json['active'] ?? true,
+      company: json['company'],
+      createdAt: DateTime.parse(json['createdAt']),
+      updatedAt: DateTime.parse(json['updatedAt']),
     );
   }
 
+  // Method to convert a Client to JSON
   Map<String, dynamic> toJson() {
     return {
       '_id': id,
-      'fullname': fullname,
-      'username': username,
-      'phone_number': phoneNumber,
-      'email': email,
-      'createdAt': createdAt,
-      'updatedAt': updatedAt,
-      '__v': v,
+      'user': user,
+      'city': city,
+      'state': state,
+      'address': address,
+      'latitude': latitude,
+      'longitude': longitude,
+      'description': description,
+      'active': active,
+      'company': company,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
     };
   }
 }
