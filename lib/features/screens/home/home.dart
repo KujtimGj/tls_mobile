@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tls/core/dimensions.dart';
 import 'package:tls/features/controllers/ticket_controllers.dart';
 import 'package:tls/features/models/ticket_model.dart';
 import 'package:tls/features/providers/processing_tickets_provider.dart';
@@ -25,12 +26,15 @@ class _HomeState extends State<Home> {
     });
   }
 
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     getProcessingTickets();
   }
+
+  int selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -46,11 +50,11 @@ class _HomeState extends State<Home> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         automaticallyImplyLeading: false,
-        centerTitle: true,
         title: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("TLS Service"),
+            Text("Hi Name"),
+            Text("Your task list for today",style: TextStyle(fontSize: 13,color: Color(0xff909090)),)
           ],
         ),
         surfaceTintColor: Colors.transparent,
@@ -68,19 +72,85 @@ class _HomeState extends State<Home> {
         padding: const EdgeInsets.all(10.0),
         child: ListView(
           children: [
-            // TextFormField(
-            //   decoration: InputDecoration(
-            //     hintText: "Search",
-            //     prefixIcon: Icon(Icons.search,size: 30,color: Colors.grey[500],),
-            //     border: OutlineInputBorder(
-            //       borderSide: BorderSide.none,
-            //       borderRadius: BorderRadius.circular(35)
-            //     ),
-            //     filled: true,
-            //     fillColor: const Color(0xfff5f5f5)
-            //   ),
-            // ),
-            // const SizedBox(height: 10),
+            TextFormField(
+              decoration: InputDecoration(
+                hintText: "Search",
+                prefixIcon: Icon(Icons.search,size: 30,color: Colors.grey[500],),
+                border: OutlineInputBorder(
+                  borderSide: BorderSide.none,
+                  borderRadius: BorderRadius.circular(35)
+                ),
+                filled: true,
+                fillColor: const Color(0xfff5f5f5)
+              ),
+            ),
+            const SizedBox(height: 10),
+            Container(
+              height: getPhoneHeight(context)*0.2,
+              width: getPhoneWitdth(context),
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                children: [
+                  Container(
+                    height: 40,
+                    width: getPhoneWitdth(context)*0.35,
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: const Color(0xff000000),
+                      borderRadius: BorderRadius.circular(15)
+                    ),
+                    child:const Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Icon(Icons.tv,color: Colors.white,size: 50,),
+                        Text("14 Tasks",style: TextStyle(color: Colors.white,fontSize: 12),),
+                        Text("TV Services",style: TextStyle(color: Colors.white,fontSize: 17,fontWeight: FontWeight.w500),)
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 15),
+                  Container(
+                    height: 40,
+                    width: getPhoneWitdth(context)*0.35,
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                        color: const Color(0xff000000),
+                        borderRadius: BorderRadius.circular(15)
+                    ),
+                    child:const Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Icon(Icons.heat_pump_outlined,color: Colors.white,size: 50,),
+                        Text("14 Tasks",style: TextStyle(color: Colors.white,fontSize: 12),),
+                        Text("TV Services",style: TextStyle(color: Colors.white,fontSize: 17,fontWeight: FontWeight.w500),)
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 15),
+                  Container(
+                    height: 40,
+                    width: getPhoneWitdth(context)*0.35,
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                        color: const Color(0xff000000),
+                        borderRadius: BorderRadius.circular(15)
+                    ),
+                    child:const Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Icon(Icons.devices_other_rounded,color: Colors.white,size: 50,),
+                        Text("14 Tasks",style: TextStyle(color: Colors.white,fontSize: 12),),
+                        Text("TV Services",style: TextStyle(color: Colors.white,fontSize: 17,fontWeight: FontWeight.w500),)
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
             Text(
               "Overview",
               style: Theme.of(context)
