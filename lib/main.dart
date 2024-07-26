@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_background/flutter_background.dart';
 import 'package:provider/provider.dart';
 import 'package:tls/features/providers/processing_tickets_provider.dart';
 import 'package:tls/features/providers/ticket_provider.dart';
@@ -9,7 +10,9 @@ import 'package:tls/features/screens/map/map.dart';
 import 'package:tls/features/screens/notifications/notifications.dart';
 import 'package:tls/features/screens/welcome/splashscreen.dart';
 
-void main() {
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await FlutterBackground.initialize();
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (_) => UserProvider()),
     ChangeNotifierProvider(create: (_) => TicketProvider()),
