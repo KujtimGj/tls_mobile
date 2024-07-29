@@ -1,32 +1,71 @@
-
 class Product {
-  String id;
-  String product;
-  String price;
-  String qty;
+  String? id;
+  String productCode;
+  String productTitle;
+  String productModel;
+  double productPrice;
+  int productAmount;
+  String? description;
+  bool sold;
+  bool active;
+  bool deleted;
+  String productCategory;
+  String clientCompany;
+  DateTime? createdAt;
+  DateTime? updatedAt;
 
   Product({
-    required this.id,
-    required this.product,
-    required this.price,
-    required this.qty,
+    this.id,
+    required this.productCode,
+    required this.productTitle,
+    required this.productModel,
+    required this.productPrice,
+    required this.productAmount,
+    this.description,
+    this.sold = false,
+    this.active = true,
+    this.deleted = false,
+    required this.productCategory,
+    required this.clientCompany,
+    this.createdAt,
+    this.updatedAt,
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
       id: json['_id'],
-      product: json['product'],
-      price: json['price'],
-      qty: json['qty'],
+      productCode: json['product_code'],
+      productTitle: json['product_title'],
+      productModel: json['product_model'],
+      productPrice: (json['product_price'] as num).toDouble(),
+      productAmount: json['product_amount'],
+      description: json['description'],
+      sold: json['sold'],
+      active: json['active'],
+      deleted: json['deleted'],
+      productCategory: json['product_category'],
+      clientCompany: json['client_company'],
+      createdAt: json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
+      updatedAt: json['updatedAt'] != null ? DateTime.parse(json['updatedAt']) : null,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       '_id': id,
-      'product': product,
-      'price': price,
-      'qty': qty,
+      'product_code': productCode,
+      'product_title': productTitle,
+      'product_model': productModel,
+      'product_price': productPrice,
+      'product_amount': productAmount,
+      'description': description,
+      'sold': sold,
+      'active': active,
+      'deleted': deleted,
+      'product_category': productCategory,
+      'client_company': clientCompany,
+      'createdAt': createdAt?.toIso8601String(),
+      'updatedAt': updatedAt?.toIso8601String(),
     };
   }
 }

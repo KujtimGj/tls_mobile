@@ -18,9 +18,14 @@ class TicketProvider extends ChangeNotifier{
   }
 
   addTickets(List<TicketModel> tickets){
-
     _pendingTickets = tickets;
     _pendingTicketsFilter = tickets;
+    notifyListeners();
+  }
+
+  removeTicket(TicketModel ticketModel){
+    _pendingTickets.removeWhere((t) => t.id == ticketModel.id);
+    _pendingTicketsFilter.removeWhere((t) => t.id == ticketModel.id);
     notifyListeners();
   }
 

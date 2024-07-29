@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_background/flutter_background.dart';
 import 'package:provider/provider.dart';
@@ -12,7 +14,7 @@ import 'package:tls/features/screens/welcome/splashscreen.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
-  await FlutterBackground.initialize();
+  if(Platform.isAndroid) {await FlutterBackground.initialize();}
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (_) => UserProvider()),
     ChangeNotifierProvider(create: (_) => TicketProvider()),

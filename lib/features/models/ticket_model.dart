@@ -2,6 +2,7 @@ import 'package:intl/intl.dart';
 import 'package:tls/features/models/client_model.dart';
 import 'package:tls/features/models/product_model.dart';
 import 'package:tls/features/models/service_company.dart';
+import 'package:tls/features/models/storage_model.dart';
 import 'package:tls/features/models/user_model.dart';
 
 class TicketModel {
@@ -10,19 +11,19 @@ class TicketModel {
   String? clientCompany;
   ServiceCompany? serviceCompany;
   Client? client;
-  TicketData? data;
+  dynamic body;
   String? status;
   int? servicePrice;
   dynamic discountPrice;
   bool? hasDiscount;
-  List<dynamic>? imagesBefore;
-  List<dynamic>? imagesAfter;
+  StorageModel? images;
   List<dynamic>? technicians;
   bool? completed;
   bool? deleted;
   String? createdAt;
   String? updatedAt;
   int? ticketNumber;
+  int? products;
   int? v;
   String? reasonComment;
 
@@ -32,44 +33,44 @@ class TicketModel {
       this.clientCompany,
       this.serviceCompany,
       this.client,
-      this.data,
+      this.body,
      this.status,
      this.servicePrice,
      this.discountPrice,
      this.hasDiscount,
-     this.imagesBefore,
-     this.imagesAfter,
+     this.images,
      this.technicians,
      this.completed,
      this.deleted,
      this.createdAt,
      this.updatedAt,
+     this.products,
      this.ticketNumber,
      this.v,
      this.reasonComment,
   });
 
   factory TicketModel.fromJson(Map<String, dynamic> json) {
-
+    print(json['images']);
     return TicketModel(
       id: json['_id'],
       addedBy: json['added_by'],
       clientCompany: json['client_company'],
       serviceCompany: ServiceCompany.fromJson(json['service_company']),
       client: Client.fromJson(json['client']),
-      data: TicketData.fromJson(json['data']),
+      body: json['data'],
       status: json['status'],
       servicePrice: json['service_price'],
       discountPrice: json['discount_price'] == null ?"": "",
       hasDiscount: json['has_discount'],
-      imagesBefore: List<dynamic>.from(json['images_before']),
-      imagesAfter: List<dynamic>.from(json['images_after']),
+      images: StorageModel.fromJson(json['images']),
       technicians: json['technicians'],
       completed: json['completed'],
       deleted: json['deleted'],
       createdAt: json['createdAt'],
       updatedAt: json['updatedAt'],
       ticketNumber: json['ticket_number'],
+      products: json['products'],
       v: json['__v'],
       reasonComment: json['reason_comment'],
     );
@@ -82,93 +83,23 @@ class TicketModel {
       'client_company': clientCompany,
       'service_company': serviceCompany!.toJson(),
       'client': client!.toJson(),
-      'data': data!.toJson(),
+      'data': body,
       'status': status,
       'service_price': servicePrice,
       'discount_price': discountPrice,
       'has_discount': hasDiscount,
-      'images_before': imagesBefore,
-      'images_after': imagesAfter,
+      'images': images!.toJson(),
       'technicians': technicians,
       'completed': completed,
       'deleted': deleted,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
       'ticket_number': ticketNumber,
+      'products': products,
       '__v': v,
       'reason_comment': reasonComment,
     };
   }
 }
 
-
-class TicketData {
-  String? id;
-  String? manufacturer;
-  String? serviceModel;
-  String? serialNumber;
-  String? buyDate;
-  String? appointmentDate;
-  String? servicePrice;
-  String? problemDescription;
-  List<Product>? product;
-  bool? hasDiscount;
-  String? discountPrice;
-
-  TicketData({
-     this.id,
-     this.manufacturer,
-     this.serviceModel,
-     this.serialNumber,
-     this.buyDate,
-     this.appointmentDate,
-     this.servicePrice,
-     this.problemDescription,
-     this.product,
-     this.hasDiscount,
-     this.discountPrice,
-  });
-
-  factory TicketData.fromJson(Map<String, dynamic> json) {
-
-    List<Product> servicesList = json['product'] == null ? []:(json['product'] as List).map((e) => Product.fromJson(e)).toList();
-    return TicketData(
-      id: json['id'],
-      manufacturer: json['manufacturer'],
-      serviceModel: json['service_model'],
-      serialNumber: json['serial_number'],
-      buyDate: json['buy_date'],
-      appointmentDate: json['appointment_data'],
-      servicePrice: json['service_price'],
-      problemDescription: json['problem_description'],
-      product: servicesList,
-      hasDiscount: json['has_discount'],
-      discountPrice: json['discount_price'],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'manufacturer': manufacturer,
-      'service_model': serviceModel,
-      'serial_number': serialNumber,
-      'buy_date': buyDate,
-      'appointment_date': appointmentDate,
-      'service_price': servicePrice,
-      'problem_description': problemDescription,
-      'product': product!.map((item) => item.toJson()).toList(),
-      'has_discount': hasDiscount,
-      'discount_price': discountPrice,
-    };
-  }
-
-  parseDate(){
-    try{
-      return DateFormat("yyyy-MM-dd HH:mm").format(DateTime.parse(appointmentDate!));
-    }catch(e){
-      return "Uncorrect date format";
-    }
-  }
-}
 

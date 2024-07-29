@@ -5,7 +5,9 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:tls/core/api.dart';
 import 'package:tls/core/errors/failures.dart';
+import 'package:tls/features/models/product_model.dart';
 import 'package:tls/features/models/ticket_model.dart';
+import 'package:tls/features/models/ticket_products_model.dart';
 import 'package:tls/features/providers/ticket_provider.dart';
 import 'package:tls/features/providers/user_provider.dart';
 
@@ -17,18 +19,18 @@ class TicketControllers {
   Future<Either<Failure, List<TicketModel>>> getPendingTickets(
       BuildContext context) async {
     var userProvider = Provider.of<UserProvider>(context, listen: false);
-    var ticketProvider = Provider.of<TicketProvider>(context, listen: false);
     Uri url = Uri.parse("$host$pendingTicketsRoute");
     requestHeaders['userID'] = userProvider.getUser()!.id;
 
       var response = await http.get(url, headers: requestHeaders);
+
       if (response.statusCode == 200) {
         var body = jsonDecode(response.body);
           List<TicketModel> tickets = body['tickets']
               .map<TicketModel>((json) => TicketModel.fromJson(json))
               .toList();
 
-          ticketProvider.addTickets(tickets);
+
           return Right(tickets);
 
       } else {
@@ -39,7 +41,6 @@ class TicketControllers {
   Future<Either<Failure, List<TicketModel>>> getProcessingTickets(
       BuildContext context) async {
     var userProvider = Provider.of<UserProvider>(context, listen: false);
-    var ticketProvider = Provider.of<TicketProvider>(context, listen: false);
     Uri url = Uri.parse("$host$processingTicketsRoute");
     requestHeaders['userID'] = userProvider.getUser()!.id;
 
@@ -50,7 +51,6 @@ class TicketControllers {
               .map<TicketModel>((json) => TicketModel.fromJson(json))
               .toList();
 
-          ticketProvider.addTickets(tickets);
           return Right(tickets);
 
       } else {
@@ -66,10 +66,84 @@ class TicketControllers {
     requestHeaders['userID'] = userProvider.getUser()!.id;
       print(url.path);
       var response = await http.put(url, headers: requestHeaders);
+      print(response.statusCode);
+      print(response.body);
       if (response.statusCode == 200) {
           return const Right(true);
       } else {
         return Left(ServerFailure());
       }
+  }
+
+  Future<Either<Failure, bool>> rejectTicket(
+      BuildContext context, String id, String comment) async {
+    var userProvider = Provider.of<UserProvider>(context, listen: false);
+    var ticketProvider = Provider.of<TicketProvider>(context, listen: false);
+    Uri url = Uri.parse("$host$rejectTicketRoute/$id");
+    requestHeaders['userID'] = userProvider.getUser()!.id;
+      var response = await http.put(url,body: jsonEncode({
+        "comment": comment,
+        "action_by": userProvider.getUser()!.id,
+      }), headers: requestHeaders);
+    print(url.path);
+    print(response.statusCode);
+    print(response.body);
+      if (response.statusCode == 200) {
+          return const Right(true);
+      } else {
+        return Left(ServerFailure());
+      }
+  }
+
+  Future<Either<Failure, bool>> returnTicket(
+      BuildContext context, String id,String comment) async {
+    var userProvider = Provider.of<UserProvider>(context, listen: false);
+    var ticketProvider = Provider.of<TicketProvider>(context, listen: false);
+    Uri url = Uri.parse("$host$returnTicketRoute/$id");
+    requestHeaders['userID'] = userProvider.getUser()!.id;
+      var response = await http.put(url,body: jsonEncode({
+        "comment": comment
+      }), headers: requestHeaders);
+    print(url.path);
+    print(response.statusCode);
+    print(response.body);
+    if (response.statusCode == 200) {
+          return const Right(true);
+      } else {
+        return Left(ServerFailure());
+      }
+  }
+
+  Future<Either<Failure, bool>> completeTicket(
+      BuildContext context, String id,var body) async {
+    var userProvider = Provider.of<UserProvider>(context, listen: false);
+    Uri url = Uri.parse("$host$completeTicketRoute/$id");
+    requestHeaders['userID'] = userProvider.getUser()!.id;
+    print("body: ${ jsonEncode(body)}");
+      var response = await http.put(url,body: jsonEncode(body), headers: requestHeaders);
+      print("response.body: ${response.body}");
+    if (response.statusCode == 200) {
+          return const Right(true);
+      } else {
+        return Left(ServerFailure());
+      }
+  }
+
+  Future<Either<Failure, List<TicketProductModel>>> getProducts(
+      BuildContext context, String ticketId) async {
+    var userProvider = Provider.of<UserProvider>(context, listen: false);
+    Uri url = Uri.parse("$host$ticketProductsRoute/$ticketId");
+    requestHeaders['userID'] = userProvider.getUser()!.id;
+    var response = await http.put(url, headers: requestHeaders);
+
+    if (response.statusCode == 200) {
+      var body = jsonDecode(response.body);
+      List<TicketProductModel> products = body['products']
+          .map<TicketProductModel>((json) => TicketProductModel.fromJson(json))
+          .toList();
+      return   Right(products);
+    } else {
+      return Left(ServerFailure());
+    }
   }
 }

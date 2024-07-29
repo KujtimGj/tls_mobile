@@ -29,6 +29,12 @@ class ProcessingTicketsProvider extends ChangeNotifier{
     notifyListeners();
   }
 
+  removeTicket(TicketModel ticketModel){
+    _processingTickets.removeWhere((t) => t.id == ticketModel.id);
+    _processingTicketsFilter.removeWhere((t) => t.id == ticketModel.id);
+    notifyListeners();
+  }
+
   clearList(){
     _processingTickets = [];
     _processingTicketsFilter = [];
