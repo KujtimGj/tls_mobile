@@ -9,6 +9,7 @@ import 'package:tls/features/screens/home/tickets/waiting_tickets.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
+  static const route ="/home";
 
   @override
   State<Home> createState() => _HomeState();

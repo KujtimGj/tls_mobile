@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "596596194168",
+    "project_id": "tls-service-51d66",
+    "storage_bucket": "tls-service-51d66.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:596596194168:android:90d5622fbb57371438a68d",
+        "android_client_info": {
+          "package_name": "com.example.tls"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB7rmgGbj-B5T5QcVpqBh8LXy54CXnE-ew"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

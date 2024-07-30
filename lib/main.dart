@@ -1,8 +1,9 @@
 import 'dart:io';
-
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background/flutter_background.dart';
 import 'package:provider/provider.dart';
+import 'package:tls/features/controllers/notification_controller.dart';
 import 'package:tls/features/providers/processing_tickets_provider.dart';
 import 'package:tls/features/providers/ticket_provider.dart';
 import 'package:tls/features/providers/user_provider.dart';
@@ -12,9 +13,15 @@ import 'package:tls/features/screens/map/map.dart';
 import 'package:tls/features/screens/profile/profile.dart';
 import 'package:tls/features/screens/welcome/splashscreen.dart';
 
+final navigatorKey = GlobalKey<NavigatorState>();
+
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
-  if(Platform.isAndroid) {await FlutterBackground.initialize();}
+  await Firebase.initializeApp();
+  if (Platform.isAndroid) {
+    await FlutterBackground.initialize();
+    await FirebaseApi().initNotifications();
+  }
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (_) => UserProvider()),
     ChangeNotifierProvider(create: (_) => TicketProvider()),

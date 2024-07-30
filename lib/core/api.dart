@@ -1,8 +1,9 @@
 
 
 // const host = "http://localhost:3010/api/v1";
+// const host="http://10.0.2.2/api/v1";
 const host = "https://tls-service.onrender.com/api/v1";
-
+//
 const uploads = "http://localhost:3010/api/uploads/";
 // const uploads = "https://ecourier-storage.s3.eu-central-1.amazonaws.com/";
 
