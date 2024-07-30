@@ -6,10 +6,10 @@ import 'package:provider/provider.dart';
 import 'package:tls/features/providers/processing_tickets_provider.dart';
 import 'package:tls/features/providers/ticket_provider.dart';
 import 'package:tls/features/providers/user_provider.dart';
-import 'package:tls/features/screens/calendar/calendar.dart';
+import 'package:tls/features/screens/notifications/notifications.dart';
 import 'package:tls/features/screens/home/home.dart';
 import 'package:tls/features/screens/map/map.dart';
-import 'package:tls/features/screens/notifications/notifications.dart';
+import 'package:tls/features/screens/profile/profile.dart';
 import 'package:tls/features/screens/welcome/splashscreen.dart';
 
 void main() async{
@@ -48,9 +48,9 @@ class _BaseState extends State<Base> {
   int selectedIndex=0;
   static final List<Widget> widgetOptions=[
     const Home(),
-    const Calendar(),
     const MapView(),
-    const Notifications()
+    const Notifications(),
+    const Profile()
   ];
 
   void _onItemTapped(int index){
@@ -78,15 +78,15 @@ class _BaseState extends State<Base> {
             label: 'Home'
           ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_month),
-              label: 'Calendar'
-          ),
-          BottomNavigationBarItem(
               icon: Icon(Icons.map),
               label: 'Map'
           ),
           BottomNavigationBarItem(
               icon: Icon(Icons.notifications_active_outlined),
+              label: "Notifications"
+          ),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.account_circle_rounded),
               label: 'Notifications'
           )
         ],
