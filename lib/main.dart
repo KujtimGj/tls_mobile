@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background/flutter_background.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tls/features/controllers/notification_controller.dart';
 import 'package:tls/features/providers/processing_tickets_provider.dart';
 import 'package:tls/features/providers/ticket_provider.dart';
@@ -18,25 +19,28 @@ final navigatorKey = GlobalKey<NavigatorState>();
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  if (Platform.isAndroid) {
-    await FlutterBackground.initialize();
-    await FirebaseApi().initNotifications();
-  }
+  // if (Platform.isAndroid) {
+  //   await FlutterBackground.initialize();
+  //   await FirebaseApi().initNotifications();
+  // }
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  var isLoggedIn = prefs.getBool("isLoggedIn")??false;
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (_) => UserProvider()),
     ChangeNotifierProvider(create: (_) => TicketProvider()),
     ChangeNotifierProvider(create: (_) => ProcessingTicketsProvider()),
-  ],child: const MyApp(),));
+  ],child:  MyApp(isLoggedIn: isLoggedIn,),));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool isLoggedIn;
+  const MyApp({super.key,required this.isLoggedIn});
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       title: 'TLS Services',
-      home: SplashScreen(),
+      home: SplashScreen(isLoggedIn: isLoggedIn),
       debugShowCheckedModeBanner: false,
     );
   }
@@ -94,7 +98,7 @@ class _BaseState extends State<Base> {
           ),
           BottomNavigationBarItem(
               icon: Icon(Icons.account_circle_rounded),
-              label: 'Notifications'
+              label: 'Profile'
           )
         ],
       ),

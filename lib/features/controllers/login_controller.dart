@@ -4,6 +4,7 @@ import 'package:dartz/dartz.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tls/core/api.dart';
 import 'package:http/http.dart' as http;
 import 'package:tls/core/errors/failures.dart';
@@ -18,18 +19,23 @@ class LoginController{
   };
 
   Future<Either<Failure,dynamic>> signIn(BuildContext context, String email, String password) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     var userProvider = Provider.of<UserProvider>(context,listen: false);
     Uri url = Uri.parse("$host$loginRoute");
-
-    var body = {};
-    body['email'] = email;
-    body['password'] = password;
-    var response = await http.post(headers: requestHeaders, url,body: jsonEncode(body));
-    print(response.statusCode);
-    print(response.body);
+    var body = jsonEncode({
+      'email': email,
+      'password': password,
+    });
+    var response = await http.post(headers: requestHeaders, url,body: body);
     if(response.statusCode == 200){
       var body = jsonDecode(response.body);
       if(body['message'] == "success"){
+      await prefs.setString("token", body['token']);
+      Map<String,dynamic>? userData=body['payload'];
+      if(userData!=null){
+        prefs.setString("fullname", body['payload']['fullname']);
+        prefs.setString("email", body['payload']['email']);
+      }
         UserModel userModel = UserModel.fromJson(body['payload']);
         userProvider.addUser(userModel);
         Navigator.pushAndRemoveUntil(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_styled_toast/flutter_styled_toast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tls/features/controllers/login_controller.dart';
 import 'package:tls/features/screens/home/home.dart';
 import 'package:tls/main.dart';
@@ -20,6 +21,8 @@ class _LoginState extends State<Login> {
   bool loging = false;
 
   login() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
     if(_email.text.isEmpty || _password.text.isEmpty){
       showToast("Please complete all fields",context: context,curve: Curves.easeOut);
     }
@@ -34,6 +37,7 @@ class _LoginState extends State<Login> {
         }
       }, (right){
         setState(() => loging = false);
+        prefs.setBool("isLoggedIn", true);
       });
     }
   }

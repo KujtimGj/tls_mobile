@@ -9,7 +9,6 @@ import 'package:tls/features/screens/home/tickets/waiting_tickets.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
-  static const route ="/home";
 
   @override
   State<Home> createState() => _HomeState();
@@ -32,7 +31,9 @@ class _HomeState extends State<Home> {
 
     TicketControllers ticketControllers = TicketControllers();
     var res = await ticketControllers.getProcessingTickets(context);
-    res.fold((failure) {}, (tickets) {
+    res.fold((failure) {
+      print(failure);
+    }, (tickets) {
       provider.addTickets(tickets);
     });
   }
@@ -59,6 +60,8 @@ class _HomeState extends State<Home> {
     var processingTicketProvider =
         Provider.of<ProcessingTicketsProvider>(context);
 
+    var user = userProvider.getUser();
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -67,7 +70,7 @@ class _HomeState extends State<Home> {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Hi ${userProvider.getUser()!.fullname}"),
+            if(user!=null)Text("Hi ${userProvider.getUser()!.fullname}"),
             const Text(
               "Your task list for today",
               style: TextStyle(fontSize: 13, color: Color(0xff909090)),
@@ -94,19 +97,6 @@ class _HomeState extends State<Home> {
           },
           child: ListView(
             children: [
-              // TextFormField(
-              //   decoration: InputDecoration(
-              //     hintText: "Search",
-              //     prefixIcon: Icon(Icons.search,size: 30,color: Colors.grey[500],),
-              //     border: OutlineInputBorder(
-              //       borderSide: BorderSide.none,
-              //       borderRadius: BorderRadius.circular(35)
-              //     ),
-              //     filled: true,
-              //     fillColor: const Color(0xfff5f5f5)
-              //   ),
-              // ),
-              // const SizedBox(height: 10),
               Row(
                 children: [
                   Expanded(

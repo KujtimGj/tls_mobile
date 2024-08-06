@@ -27,7 +27,7 @@ class FirebaseApi{
   final _localNotifications=FlutterLocalNotificationsPlugin();
   void handleMessage(RemoteMessage? message){
     if(message==null)return;
-    navigatorKey.currentState?.pushNamed(Home.route,arguments: message);
+    // navigatorKey.currentState?.pushNamed(Home.route,arguments: message);
   }
 
   Future<void> initNotifications () async{

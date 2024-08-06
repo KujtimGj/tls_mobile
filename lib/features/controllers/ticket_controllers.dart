@@ -22,20 +22,19 @@ class TicketControllers {
     Uri url = Uri.parse("$host$pendingTicketsRoute");
     requestHeaders['userID'] = userProvider.getUser()!.id;
 
-      var response = await http.get(url, headers: requestHeaders);
+    var response = await http.get(url, headers: requestHeaders);
+    print(response.body);
 
-      if (response.statusCode == 200) {
-        var body = jsonDecode(response.body);
-          List<TicketModel> tickets = body['tickets']
-              .map<TicketModel>((json) => TicketModel.fromJson(json))
-              .toList();
+    if (response.statusCode == 200) {
+      var body = jsonDecode(response.body);
+      List<TicketModel> tickets = body['tickets']
+          .map<TicketModel>((json) => TicketModel.fromJson(json))
+          .toList();
 
-
-          return Right(tickets);
-
-      } else {
-        return Left(ServerFailure());
-      }
+      return Right(tickets);
+    } else {
+      return Left(ServerFailure());
+    }
   }
 
   Future<Either<Failure, List<TicketModel>>> getProcessingTickets(
@@ -44,18 +43,18 @@ class TicketControllers {
     Uri url = Uri.parse("$host$processingTicketsRoute");
     requestHeaders['userID'] = userProvider.getUser()!.id;
 
-      var response = await http.get(url, headers: requestHeaders);
-      if (response.statusCode == 200) {
-        var body = jsonDecode(response.body);
-          List<TicketModel> tickets = body['tickets']
-              .map<TicketModel>((json) => TicketModel.fromJson(json))
-              .toList();
+    var response = await http.get(url, headers: requestHeaders);
+    print(response.body);
+    if (response.statusCode == 200) {
+      var body = jsonDecode(response.body);
+      List<TicketModel> tickets = body['tickets']
+          .map<TicketModel>((json) => TicketModel.fromJson(json))
+          .toList();
 
-          return Right(tickets);
-
-      } else {
-        return Left(ServerFailure());
-      }
+      return Right(tickets);
+    } else {
+      return Left(ServerFailure());
+    }
   }
 
   Future<Either<Failure, bool>> ticketOnProcess(
@@ -64,15 +63,15 @@ class TicketControllers {
     var ticketProvider = Provider.of<TicketProvider>(context, listen: false);
     Uri url = Uri.parse("$host$ticketOnProcessRoute/$id");
     requestHeaders['userID'] = userProvider.getUser()!.id;
-      print(url.path);
-      var response = await http.put(url, headers: requestHeaders);
-      print(response.statusCode);
-      print(response.body);
-      if (response.statusCode == 200) {
-          return const Right(true);
-      } else {
-        return Left(ServerFailure());
-      }
+    print(url.path);
+    var response = await http.put(url, headers: requestHeaders);
+    print(response.statusCode);
+    print(response.body);
+    if (response.statusCode == 200) {
+      return const Right(true);
+    } else {
+      return Left(ServerFailure());
+    }
   }
 
   Future<Either<Failure, bool>> rejectTicket(
@@ -81,52 +80,54 @@ class TicketControllers {
     var ticketProvider = Provider.of<TicketProvider>(context, listen: false);
     Uri url = Uri.parse("$host$rejectTicketRoute/$id");
     requestHeaders['userID'] = userProvider.getUser()!.id;
-      var response = await http.put(url,body: jsonEncode({
-        "comment": comment,
-        "action_by": userProvider.getUser()!.id,
-      }), headers: requestHeaders);
+    var response = await http.put(url,
+        body: jsonEncode({
+          "comment": comment,
+          "action_by": userProvider.getUser()!.id,
+        }),
+        headers: requestHeaders);
     print(url.path);
     print(response.statusCode);
     print(response.body);
-      if (response.statusCode == 200) {
-          return const Right(true);
-      } else {
-        return Left(ServerFailure());
-      }
+    if (response.statusCode == 200) {
+      return const Right(true);
+    } else {
+      return Left(ServerFailure());
+    }
   }
 
   Future<Either<Failure, bool>> returnTicket(
-      BuildContext context, String id,String comment) async {
+      BuildContext context, String id, String comment) async {
     var userProvider = Provider.of<UserProvider>(context, listen: false);
     var ticketProvider = Provider.of<TicketProvider>(context, listen: false);
     Uri url = Uri.parse("$host$returnTicketRoute/$id");
     requestHeaders['userID'] = userProvider.getUser()!.id;
-      var response = await http.put(url,body: jsonEncode({
-        "comment": comment
-      }), headers: requestHeaders);
+    var response = await http.put(url,
+        body: jsonEncode({"comment": comment}), headers: requestHeaders);
     print(url.path);
     print(response.statusCode);
     print(response.body);
     if (response.statusCode == 200) {
-          return const Right(true);
-      } else {
-        return Left(ServerFailure());
-      }
+      return const Right(true);
+    } else {
+      return Left(ServerFailure());
+    }
   }
 
   Future<Either<Failure, bool>> completeTicket(
-      BuildContext context, String id,var body) async {
+      BuildContext context, String id, var body) async {
     var userProvider = Provider.of<UserProvider>(context, listen: false);
     Uri url = Uri.parse("$host$completeTicketRoute/$id");
     requestHeaders['userID'] = userProvider.getUser()!.id;
-    print("body: ${ jsonEncode(body)}");
-      var response = await http.put(url,body: jsonEncode(body), headers: requestHeaders);
-      print("response.body: ${response.body}");
+    print("body: ${jsonEncode(body)}");
+    var response =
+        await http.put(url, body: jsonEncode(body), headers: requestHeaders);
+    print("response.body: ${response.body}");
     if (response.statusCode == 200) {
-          return const Right(true);
-      } else {
-        return Left(ServerFailure());
-      }
+      return const Right(true);
+    } else {
+      return Left(ServerFailure());
+    }
   }
 
   Future<Either<Failure, List<TicketProductModel>>> getProducts(
@@ -141,7 +142,7 @@ class TicketControllers {
       List<TicketProductModel> products = body['products']
           .map<TicketProductModel>((json) => TicketProductModel.fromJson(json))
           .toList();
-      return   Right(products);
+      return Right(products);
     } else {
       return Left(ServerFailure());
     }

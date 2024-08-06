@@ -27,6 +27,7 @@ class _MapViewState extends State<MapView> {
   @override
   void initState() {
     super.initState();
+    getMyLocation();
     _requestPermission();
     _startBackgroundTask();
     _loadDirections();
@@ -160,21 +161,69 @@ class _MapViewState extends State<MapView> {
       );
     });
   }
+  LatLng _initialPosition = LatLng(37.7749, -122.4194); // Default location (San Francisco)
+  late Position _currentPosition;
+
+  getMyLocation() async {
+    _currentPosition = await Geolocator.getCurrentPosition();
+    setState(() {
+      _initialPosition = LatLng(_currentPosition.latitude, _currentPosition.longitude);
+    });
+
+    final GoogleMapController controller = await _controller.future;
+    controller.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(
+          target: _initialPosition,
+          zoom: 14.0,
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: GoogleMap(
-        mapToolbarEnabled: true,
-        zoomControlsEnabled: false,
-        buildingsEnabled: false,
-        trafficEnabled: true,
-        mapType: MapType.satellite,
-        onMapCreated: (GoogleMapController controller) {
-          _controller.complete(controller);
-        },
-        initialCameraPosition: _kGooglePlex,
-        polylines: _polylines,
+      body: Stack(
+        children: [
+          GoogleMap(
+            mapToolbarEnabled: false,
+            zoomControlsEnabled: false,
+            buildingsEnabled: true,
+            trafficEnabled: true,
+            mapType: MapType.normal,
+            myLocationEnabled: true,
+            myLocationButtonEnabled: false,
+            onMapCreated: (GoogleMapController controller) {
+              _controller.complete(controller);
+            },
+            initialCameraPosition: CameraPosition(
+              target: _initialPosition,
+              zoom: 14.0,
+            ),
+            polylines: _polylines,
+          ),
+          Positioned(
+            bottom: 10,
+            right: 10,
+            child: GestureDetector(
+              onTap: (){
+                getMyLocation();
+              },
+              child: Container(
+                height: 60,
+                width: 60,
+                decoration: BoxDecoration(
+                  color: Colors.grey[400]!.withOpacity(0.8),
+                  shape: BoxShape.circle
+                ),
+                child: const Center(
+                  child: Icon(Icons.my_location,color: Colors.black,),
+                ),
+              ),
+            ),
+          )
+        ],
       ),
     );
   }

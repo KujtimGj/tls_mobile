@@ -12,7 +12,8 @@ import 'package:tls/features/screens/welcome/login.dart';
 import 'package:tls/main.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+  final bool isLoggedIn;
+  const SplashScreen({super.key,required this.isLoggedIn});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -21,32 +22,31 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
+    print("splash");
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((callback){
-      Future.delayed(Duration(seconds: 1)).then((value){
-        checkLogin(context);
-      });
+    Timer(const Duration(seconds: 3),(){
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_)=>widget.isLoggedIn? const Base():const Login()));
     });
 
   }
 
-  checkLogin(context) async {
-
-    var userProvider  = Provider.of<UserProvider>(context,listen: false);
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-
-    var userData =   preferences.getString("tls_user");
-
-    if(userData != null){
-      UserModel userModel = UserModel.fromJson(jsonDecode(userData));
-      userProvider.addUser(userModel);
-      Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (_) => Base()), (_) => true);
-    }
-    else{
-      Navigator.pushAndRemoveUntil(context,
-          MaterialPageRoute(builder: (_) => const Login()), (route) => true);
-    }
-  }
+  // checkLogin(context) async {
+  //
+  //   var userProvider  = Provider.of<UserProvider>(context,listen: false);
+  //   SharedPreferences preferences = await SharedPreferences.getInstance();
+  //
+  //   var userData =   preferences.getString("tls_user");
+  //
+  //   if(userData != null){
+  //     UserModel userModel = UserModel.fromJson(jsonDecode(userData));
+  //     userProvider.addUser(userModel);
+  //     Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (_) => Base()), (_) => true);
+  //   }
+  //   else{
+  //     Navigator.pushAndRemoveUntil(context,
+  //         MaterialPageRoute(builder: (_) => const Login()), (route) => true);
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {

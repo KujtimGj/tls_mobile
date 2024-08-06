@@ -174,6 +174,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                     minLines: 3,
                     maxLines: 7,
                     decoration: InputDecoration(
+                      enabled: false,
                         hintText: "Reason here...",
                         border: InputBorder.none,
                         enabledBorder: OutlineInputBorder(
@@ -474,7 +475,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                 height: 30,
                 thickness: 0.6,
               ),
-              bodyNavigation(widget.ticketModel!.body),
+              bodyNavigation(widget!.ticketModel!.body),
               const SizedBox(height: 25),
               nextButton(size),
               const SizedBox(height: 25),
