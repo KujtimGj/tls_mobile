@@ -68,6 +68,7 @@ class _TicketImagesState extends State<TicketImages> {
                     else{
                       image = widget.storageModel!.filesAfter![index];
                     }
+                    print("---- $uploads$image");
                     return GestureDetector(
                       onTap: () {
                         Navigator.of(context).push(MaterialPageRoute(
