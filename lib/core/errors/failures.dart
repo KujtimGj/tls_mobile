@@ -47,6 +47,13 @@ class WrongDataFailure extends Failure {
   List<Object?> get props => [message ?? WRONG_DATA_FAILURE_MESSAGE];
 }
 
+class InvalidCredentials extends Failure {
+  final String? message;
+  InvalidCredentials({this.message});
+  @override
+  List<Object?> get props => [message ?? WRONG_DATA_FAILURE_MESSAGE];
+}
+
 class UnauthorizedFailure extends Failure {
   final dynamic? message;
   UnauthorizedFailure({this.message});

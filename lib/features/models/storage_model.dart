@@ -30,9 +30,12 @@ class StorageModel {
     return filesAfter!.length;
   }
 
-  factory StorageModel.fromJson(Map<String, dynamic>? json) {
+  factory StorageModel.fromJson(dynamic json) {
     if(json == null){
       return StorageModel();
+    }
+    if(json.runtimeType == String){
+      return StorageModel(id: json);
     }
     return StorageModel(
       id: json['_id'],

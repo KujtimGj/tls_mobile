@@ -114,6 +114,7 @@ class _GeneralBodyState extends State<GeneralBody> {
 
   @override
   Widget build(BuildContext context) {
+    print(widget.ticketModel!.status);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -395,7 +396,7 @@ class _GeneralBodyState extends State<GeneralBody> {
         TextField(
           controller: TextEditingController(
               text:
-                  "${double.parse(widget.generalTicketData!.servicePrice!) - double.parse(widget.generalTicketData!.discountPrice!)}€"),
+                  "${double.parse(widget.generalTicketData!.servicePrice!) - widget.generalTicketData!.getDiscountPrice()}€"),
           decoration: InputDecoration(
               border: InputBorder.none,
               enabledBorder: OutlineInputBorder(

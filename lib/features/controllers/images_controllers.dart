@@ -41,8 +41,9 @@ class ImagesControllers {
 
     // Send the request and handle the response
     var response = await request.send();
+    print("status code: ${response.statusCode}");
     var responseBody = await response.stream.bytesToString();
-
+    print(responseBody);
     StorageModel storageModel = StorageModel.fromJson(jsonDecode(responseBody)['storage']);
     print(type);
     if (response.statusCode == 200) {

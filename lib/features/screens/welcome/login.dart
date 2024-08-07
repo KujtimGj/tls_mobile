@@ -18,7 +18,7 @@ class _LoginState extends State<Login> {
   final TextEditingController _email = TextEditingController();
   final TextEditingController _password = TextEditingController();
 
-  bool loging = false;
+  bool logging = false;
 
   login() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -27,16 +27,17 @@ class _LoginState extends State<Login> {
       showToast("Please complete all fields",context: context,curve: Curves.easeOut);
     }
     else {
-      setState(() => loging = true);
+      setState(() => logging = true);
       LoginController loginController = LoginController();
       var data = await loginController.signIn(context, _email.text, _password.text);
       data.fold((left){
-        setState(() => loging = false);
+        print(left.props);
+        setState(() => logging = false);
         if(left.props.isNotEmpty){
-          showToast(left.props.first.toString());
+          showToast(left.props.first.toString(),context: context);
         }
       }, (right){
-        setState(() => loging = false);
+        setState(() => logging = false);
         prefs.setBool("isLoggedIn", true);
       });
     }
@@ -112,8 +113,8 @@ class _LoginState extends State<Login> {
                   margin: const EdgeInsets.only(top: 20),
                   decoration: BoxDecoration(
                       color: Colors.black, borderRadius: BorderRadius.circular(10)),
-                  child: const Center(
-                    child: Text(
+                  child:   Center(
+                    child: logging ? CircularProgressIndicator():Text(
                       "Sign in",
                       style: TextStyle(color: Colors.white),
                     ),

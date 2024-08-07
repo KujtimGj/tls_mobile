@@ -131,7 +131,8 @@ class _PickUpBodyState extends State<PickUpBody> {
         const SizedBox(
           height: 4,
         ),
-        TextField(readOnly: true,
+        TextField(
+          readOnly: true,
           controller: TextEditingController(
               text: widget.pickUpTicketData!.memoryName ?? ""),
           decoration: InputDecoration(
@@ -208,7 +209,8 @@ class _PickUpBodyState extends State<PickUpBody> {
         const SizedBox(
           height: 4,
         ),
-        TextField(readOnly: true,
+        TextField(
+          readOnly: true,
           controller: TextEditingController(
               text: widget.pickUpTicketData!.oldMemorySerialNumber ?? ""),
           decoration: InputDecoration(
@@ -233,7 +235,8 @@ class _PickUpBodyState extends State<PickUpBody> {
         const SizedBox(
           height: 4,
         ),
-        TextField(readOnly: true,
+        TextField(
+          readOnly: true,
           controller: TextEditingController(
               text: widget.pickUpTicketData!.newMemorySerialNumber ?? ""),
           decoration: InputDecoration(
@@ -258,7 +261,8 @@ class _PickUpBodyState extends State<PickUpBody> {
         const SizedBox(
           height: 4,
         ),
-        TextField(readOnly: true,
+        TextField(
+          readOnly: true,
           controller: TextEditingController(
               text: "${widget.ticketModel?.products ?? 0}"),
           decoration: InputDecoration(
@@ -860,17 +864,17 @@ class _PickUpBodyState extends State<PickUpBody> {
                     height: 10,
                   ),
                   const Text("Deadline"),
-                  const SizedBox(height: 4,),
-         TextField(readOnly: true,
-                  
+                  const SizedBox(height: 4),
+                  TextField(
+                    readOnly: true,
                     controller: TextEditingController(
                         text: widget.pickUpTicketData!.parseDate()),
                     decoration: InputDecoration(
-                      prefixIcon: Icon(
-                        Icons.access_time_sharp,
-                        size: 25,
-                        color: Colors.grey[500],
-                      ),
+                        prefixIcon: Icon(
+                          Icons.access_time_sharp,
+                          size: 25,
+                          color: Colors.grey[500],
+                        ),
                         border: InputBorder.none,
                         enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
@@ -879,10 +883,9 @@ class _PickUpBodyState extends State<PickUpBody> {
                             borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide(color: Colors.grey[400]!)),
                         isDense: true,
-                        contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 15, vertical: 13)),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 13)),
                   ),
-
                   const SizedBox(
                     height: 10,
                   ),
@@ -893,7 +896,7 @@ class _PickUpBodyState extends State<PickUpBody> {
                   const SizedBox(
                     height: 4,
                   ),
-         TextField(
+                  TextField(
                     controller: inverterUsed,
                     onChanged: (value) {
                       setState(() {
@@ -922,7 +925,8 @@ class _PickUpBodyState extends State<PickUpBody> {
                   const SizedBox(
                     height: 4,
                   ),
-         TextField(readOnly: true,
+                  TextField(
+                    readOnly: true,
                     onTap: () {
                       if (installationDate.text.isEmpty) {
                         setState(() {

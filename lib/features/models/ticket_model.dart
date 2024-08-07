@@ -51,7 +51,7 @@ class TicketModel {
   });
 
   factory TicketModel.fromJson(Map<String, dynamic> json) {
-    print(json['images']);
+    print("json['images']: ${json['images']}");
     return TicketModel(
       id: json['_id'],
       addedBy: json['added_by'],

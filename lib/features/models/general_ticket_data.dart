@@ -38,6 +38,20 @@ class GeneralTicketData {
     this.discountPrice,
   });
 
+  double getPrice(){
+    if(servicePrice == null || servicePrice!.isEmpty){
+      return 0.0;
+    }
+    return double.parse(servicePrice ?? "0");
+  }
+
+  double getDiscountPrice(){
+    if(discountPrice == null || discountPrice!.isEmpty){
+      return 0.0;
+    }
+    return double.parse(discountPrice ?? "0");
+  }
+
   factory GeneralTicketData.fromJson(Map<String, dynamic> json) {
 
     List<Product> servicesList = json['product'] == null ? []:(json['product'] as List).map((e) => Product.fromJson(e)).toList();

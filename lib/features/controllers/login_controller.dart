@@ -27,6 +27,8 @@ class LoginController{
       'password': password,
     });
     var response = await http.post(headers: requestHeaders, url,body: body);
+      print(response.statusCode);
+      print(response.body);
     if(response.statusCode == 200){
       var body = jsonDecode(response.body);
       if(body['message'] == "success"){
@@ -43,9 +45,13 @@ class LoginController{
             MaterialPageRoute(builder: (_) => const Base()),
                 (route) => false);
       }
+      else if(body['message'] == "invalid_credentials"){
+        print("Sdfsd");
+        return Left(InvalidCredentials(message: "Email or password incorrect"));
+      }
       return const Right("");
     }
-    else if(response.statusCode == 200){
+    else if(response.statusCode == 401){
       return Left(WrongDataFailure(message: "Email or password is incorrect!"));
     }
     else{
