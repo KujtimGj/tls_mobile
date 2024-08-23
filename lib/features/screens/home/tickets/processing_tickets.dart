@@ -23,7 +23,7 @@ class _ProcessingTicketsState extends State<ProcessingTickets> {
     TicketControllers ticketControllers = TicketControllers();
     var res = await ticketControllers.getProcessingTickets(context);
     res.fold((falure) {}, (tickets) {
-      provider.addTickets(tickets);
+        provider.addTickets(tickets);
     });
   }
 

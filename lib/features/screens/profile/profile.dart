@@ -14,8 +14,6 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
-
-
   String? fullName;
   String? email;
   @override
@@ -23,8 +21,9 @@ class _ProfileState extends State<Profile> {
     getMyAcc();
     super.initState();
   }
-  getMyAcc()async{
-    SharedPreferences prefs =await SharedPreferences.getInstance();
+
+  getMyAcc() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       fullName = prefs.getString("fullname");
       email = prefs.getString("email");
@@ -33,13 +32,12 @@ class _ProfileState extends State<Profile> {
     print(email);
   }
 
-  logout()async{
+  logout() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.remove("fullname");
     prefs.remove("email");
-    prefs.setBool('isLoggedIn',false);
+    prefs.setBool('isLoggedIn', false);
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -64,8 +62,11 @@ class _ProfileState extends State<Profile> {
                       Container(
                         height: 60,
                         width: 60,
-                        decoration: const BoxDecoration(
-                            shape: BoxShape.circle, color: Colors.black),
+                        child: Icon(
+                          Icons.pan_tool_alt_outlined,
+                          size: 30,
+                        ),
+                        decoration: const BoxDecoration(shape: BoxShape.circle),
                       ),
                       const SizedBox(width: 10),
                       Column(
@@ -87,67 +88,19 @@ class _ProfileState extends State<Profile> {
                       )
                     ],
                   ),
-
                 ],
-              ),
-              const SizedBox(height: 25),
-              const Text(
-                "Last task",
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w500),
-              ),
-              Container(
-                height: 60,
-                width: getPhoneWitdth(context),
-                margin: const EdgeInsets.only(top: 10),
-                decoration: BoxDecoration(
-                    color: const Color(0xffeaeaea),
-                    borderRadius: BorderRadius.circular(15)),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Container(
-                      height: getPhoneHeight(context),
-                      width: 50,
-                      margin: const EdgeInsets.all(5),
-                      decoration: const BoxDecoration(
-                          color: Colors.black, shape: BoxShape.circle),
-                      child: const Center(
-                        child: Icon(
-                          Icons.done,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                    const Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "TV Service",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        Text(
-                          "LG",
-                          style:
-                              TextStyle(fontSize: 14, color: Color(0xff909090)),
-                        )
-                      ],
-                    )
-                  ],
-                ),
               ),
               const SizedBox(height: 20),
               const Text(
                 "Settings",
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.w500),
               ),
-
               Container(
                 height: 60,
                 width: getPhoneWitdth(context),
                 margin: const EdgeInsets.only(top: 10),
                 decoration:
-                BoxDecoration(borderRadius: BorderRadius.circular(15)),
+                    BoxDecoration(borderRadius: BorderRadius.circular(15)),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -186,7 +139,7 @@ class _ProfileState extends State<Profile> {
                 width: getPhoneWitdth(context),
                 margin: const EdgeInsets.only(top: 10),
                 decoration:
-                BoxDecoration(borderRadius: BorderRadius.circular(15)),
+                    BoxDecoration(borderRadius: BorderRadius.circular(15)),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -222,18 +175,20 @@ class _ProfileState extends State<Profile> {
               ),
               const SizedBox(height: 30),
               GestureDetector(
-                onTap: (){
+                onTap: () {
                   logout();
                   Navigator.pushAndRemoveUntil(
                       context,
                       MaterialPageRoute(builder: (_) => const Login()),
-                          (route) => false);
+                      (route) => false);
                 },
                 child: const Center(
                   child: Text(
                     "Log out",
                     style: TextStyle(
-                        fontWeight: FontWeight.w500, color: Colors.red,fontSize: 20),
+                        fontWeight: FontWeight.w500,
+                        color: Colors.red,
+                        fontSize: 20),
                   ),
                 ),
               )
