@@ -4,21 +4,22 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:tls/features/controllers/ticket_controllers.dart';
 import 'package:tls/features/models/ticket_model.dart';
+import 'package:tls/features/providers/finished_tickets_provider.dart';
 import 'package:tls/features/providers/processing_tickets_provider.dart';
 import 'package:tls/features/providers/ticket_provider.dart';
 import 'package:tls/features/screens/home/tickets/task_details.dart';
 
-class WaitingTickets extends StatefulWidget {
+class FinishedTickets extends StatefulWidget {
   final bool? loading;
-  const WaitingTickets({super.key, required this.loading});
+  const FinishedTickets({super.key, required this.loading});
 
   @override
-  State<WaitingTickets> createState() => _WaitingTicketsState();
+  State<FinishedTickets> createState() => _FinishedTicketsState();
 }
 
-class _WaitingTicketsState extends State<WaitingTickets> {
+class _FinishedTicketsState extends State<FinishedTickets> {
 
-  getWaitingTickets() async {
+  getFinishedTickets() async {
     var provider =
     Provider.of<ProcessingTicketsProvider>(context, listen: false);
 
@@ -32,13 +33,13 @@ class _WaitingTicketsState extends State<WaitingTickets> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    var waitingTicketsProvider = Provider.of<TicketProvider>(context);
+    var processingTicketProvider = Provider.of<FinishedTicketsProvider>(context);
     return widget.loading == true ? Center(child: CircularProgressIndicator(strokeWidth: 1.6,),):ListView.builder(
       shrinkWrap: true,
       physics: const ClampingScrollPhysics(),
       itemBuilder: (context, index) {
         TicketModel ticketModel =
-        waitingTicketsProvider.getPendingTickets()[index];
+        processingTicketProvider.getFinishedTickets()[index];
         return Padding(
           padding: const EdgeInsets.only(bottom: 14),
           child: GestureDetector(
@@ -49,7 +50,7 @@ class _WaitingTicketsState extends State<WaitingTickets> {
                       builder: (_) => TaskDetails(
                         ticketModel: ticketModel,
                       ))).then((value) {
-                getWaitingTickets();
+                getFinishedTickets();
               });
             },
             child: Container(
@@ -138,7 +139,7 @@ class _WaitingTicketsState extends State<WaitingTickets> {
                           children: [
                             Icon(Icons.timelapse),
                             SizedBox(width: 10,),
-                            Text("${DateFormat  ('dd MMM yyyy').format(ticketModel.createdAt!)}")
+                            Text("${DateFormat('dd MMM yyyy').format(ticketModel.createdAt!)}")
                           ],
                         ),
                       ),
@@ -151,7 +152,7 @@ class _WaitingTicketsState extends State<WaitingTickets> {
           ),
         );
       },
-      itemCount: waitingTicketsProvider.getPendingTickets().length,
+      itemCount: processingTicketProvider.getFinishedTickets().length,
     );
   }
 }

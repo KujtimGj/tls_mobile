@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:596596194168:android:90d5622fbb57371438a68d",
+        "mobilesdk_app_id": "1:596596194168:android:d9afe6a75d227c7638a68d",
         "android_client_info": {
-          "package_name": "com.example.tls"
+          "package_name": "com.tlsservice.tls"
         }
       },
       "oauth_client": [],

@@ -207,10 +207,10 @@ class _RepairBodyState extends State<RepairBody> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            "Images before ${widget.ticketModel!.images!.getFilesBeforeLength()}",
+                            "Images before ${widget.ticketModel?.images?.getFilesBeforeLength() ?? ""}",
                             style: const TextStyle(fontSize: 17),
                           ),
-                          widget.ticketModel!.images!.getFilesBeforeLength() ==
+                          widget.ticketModel?.images?.getFilesBeforeLength() ==
                                   0
                               ? const SizedBox()
                               : GestureDetector(
@@ -488,10 +488,10 @@ class _RepairBodyState extends State<RepairBody> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            "Images after ${widget.ticketModel!.images!.getFilesAfterLength()}",
+                            "Images after ${widget.ticketModel?.images?.getFilesAfterLength() ?? ""}",
                             style: const TextStyle(fontSize: 17),
                           ),
-                          widget.ticketModel!.images!.getFilesAfterLength() == 0
+                          widget.ticketModel?.images?.getFilesAfterLength() == 0
                               ? const SizedBox()
                               : GestureDetector(
                                   onTap: () {
@@ -807,18 +807,7 @@ class _RepairBodyState extends State<RepairBody> {
                         focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide(color: Colors.grey[400]!)),
-                        suffixIcon: widget.repairTicketData!.product!.isEmpty
-                            ? const SizedBox()
-                            : Container(
-                            color: Colors.transparent,
-                            width: 70,
-                            height: 50,
-                            child: const Center(
-                                child: Text(
-                                  "Shiko",
-                                  style: TextStyle(
-                                      fontSize: 15, fontWeight: FontWeight.w600),
-                                ))),
+
                         isDense: true,
                         contentPadding:
                         const EdgeInsets.symmetric(horizontal: 15, vertical: 13)),
@@ -846,18 +835,7 @@ class _RepairBodyState extends State<RepairBody> {
                         focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide(color: Colors.grey[400]!)),
-                        suffixIcon: widget.repairTicketData!.product!.isEmpty
-                            ? const SizedBox()
-                            : Container(
-                            color: Colors.transparent,
-                            width: 70,
-                            height: 50,
-                            child: const Center(
-                                child: Text(
-                                  "Shiko",
-                                  style: TextStyle(
-                                      fontSize: 15, fontWeight: FontWeight.w600),
-                                ))),
+
                         isDense: true,
                         contentPadding:
                         const EdgeInsets.symmetric(horizontal: 15, vertical: 13)),
@@ -885,18 +863,7 @@ class _RepairBodyState extends State<RepairBody> {
                         focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide(color: Colors.grey[400]!)),
-                        suffixIcon: widget.repairTicketData!.product!.isEmpty
-                            ? const SizedBox()
-                            : Container(
-                            color: Colors.transparent,
-                            width: 70,
-                            height: 50,
-                            child: const Center(
-                                child: Text(
-                                  "Shiko",
-                                  style: TextStyle(
-                                      fontSize: 15, fontWeight: FontWeight.w600),
-                                ))),
+
                         isDense: true,
                         contentPadding:
                         const EdgeInsets.symmetric(horizontal: 15, vertical: 13)),

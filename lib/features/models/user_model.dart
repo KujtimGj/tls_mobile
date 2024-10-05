@@ -7,6 +7,7 @@ class UserModel {
   String email;
   String role;
   Company? company;
+  String? fcmToken;
   bool active;
   bool deleted;
   String createdAt;
@@ -23,6 +24,7 @@ class UserModel {
     required this.email,
     required this.role,
     required this.company,
+    required this.fcmToken,
     required this.active,
     required this.deleted,
     required this.createdAt,
@@ -41,6 +43,7 @@ class UserModel {
       email: json['email'],
       role: json['role'],
       company: json['company'].runtimeType == String? Company(id: json['company']): Company.fromJson(json['company']),
+      fcmToken: json['fcm_token'],
       active: json['active'],
       deleted: json['deleted'],
       createdAt: json['createdAt'],

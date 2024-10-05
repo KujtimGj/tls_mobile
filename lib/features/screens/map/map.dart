@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_print
 
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -29,7 +30,9 @@ class _MapViewState extends State<MapView> {
   void initState() {
     super.initState();
     _requestPermission();
-    _startBackgroundTask();
+    if(Platform.isAndroid){
+      _startBackgroundTask();
+    }
     getProcessingTickets();
   }
 
@@ -41,7 +44,7 @@ class _MapViewState extends State<MapView> {
       print('Location permission denied');
     } else if (status.isPermanentlyDenied) {
       print('Location permission permanently denied');
-      openAppSettings();
+      // openAppSettings();
     }
   }
 
@@ -85,8 +88,8 @@ class _MapViewState extends State<MapView> {
     });
   }
 
-  final LatLng _initialPosition = const LatLng(
-      48.76312862329226, 9.160379099401501);
+  final LatLng _initialPosition =
+      const LatLng(48.76312862329226, 9.160379099401501);
 
   final Set<Marker> _markers = {};
 
@@ -107,26 +110,27 @@ class _MapViewState extends State<MapView> {
         var markerId = MarkerId(ticket.id!);
 
         Marker marker = Marker(
-          icon: BitmapDescriptor.defaultMarker,
-          markerId: markerId,
-          position: LatLng(latitude, longitude),
-          infoWindow: InfoWindow(
-            title: ticket.client!.user!.fullname,
-            snippet: ticket.serviceCompany!.companyName,
-          ),
-          onTap: (){
-            Timer(Duration(seconds: 2),(){
-              Navigator.push(context, MaterialPageRoute(builder: (_)=>TaskDetails(ticketModel: ticket)));
+            icon: BitmapDescriptor.defaultMarker,
+            markerId: markerId,
+            position: LatLng(latitude, longitude),
+            infoWindow: InfoWindow(
+              title: ticket.client!.user!.fullname,
+              snippet: ticket.serviceCompany!.companyName,
+            ),
+            onTap: () {
+              Timer(const Duration(milliseconds: 200), () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => TaskDetails(ticketModel: ticket)));
+              });
             });
-          }
-        );
 
         _markers.add(marker);
       }
       setState(() {});
     });
   }
-
 
   final LatLngBounds germanyBounds = LatLngBounds(
     southwest: const LatLng(47.2701114, 5.8663425), // Southwest corner
@@ -172,12 +176,17 @@ class _MapViewState extends State<MapView> {
               buildingsEnabled: false,
               trafficEnabled: true,
               mapType: MapType.normal,
-              zoomControlsEnabled: mapOptHidden==true?false:true,
+              zoomControlsEnabled: mapOptHidden == true ? false : true,
               myLocationEnabled: true,
-              myLocationButtonEnabled: mapOptHidden==true?false:true,
+              myLocationButtonEnabled: mapOptHidden == true ? false : true,
               onMapCreated: (GoogleMapController controller) {
                 _controller.complete(controller);
                 googleMapController = controller;
+              },
+              onTap: (d) {
+                setState(() {
+                  mapOptHidden = false;
+                });
               },
               initialCameraPosition: CameraPosition(
                 target: _initialPosition,
@@ -192,11 +201,11 @@ class _MapViewState extends State<MapView> {
               child: GestureDetector(
                 onTap: () {
                   setState(() {
-                    mapOptHidden=!mapOptHidden;
+                    mapOptHidden = !mapOptHidden;
                   });
                 },
                 child: Visibility(
-                  visible: mapOptHidden==true?false:true,
+                  visible: mapOptHidden == true ? false : true,
                   child: Container(
                     height: 50,
                     width: 50,
@@ -221,34 +230,35 @@ class _MapViewState extends State<MapView> {
               child: Visibility(
                 visible: mapOptHidden,
                 child: Container(
-                  height: 200,
                   width: getPhoneWitdth(context),
-                  decoration: const BoxDecoration(color: Colors.black87),
-                  child: ListView(children: [
+                  height: getPhoneHeight(context) * 0.7,
+                  decoration: const BoxDecoration(color: Colors.white),
+                  child: ListView(padding: const EdgeInsets.only(top: 0), children: [
                     Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 12,vertical: 7),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text(
                             "Task List",
-                            style: TextStyle(fontSize: 20, color: Colors.white),
+                            style: TextStyle(fontSize: 20, color: Colors.black),
                           ),
                           GestureDetector(
                               onTap: () {
                                 setState(() {
-                                  mapOptHidden=!mapOptHidden;
+                                  mapOptHidden = !mapOptHidden;
                                 });
                               },
                               child: const Icon(
                                 Icons.clear,
                                 size: 30,
-                                color: Colors.white,
+                                color: Colors.black,
                               ))
                         ],
                       ),
                     ),
                     ListView.builder(
+                      padding: EdgeInsets.only(top: 0),
                       shrinkWrap: true,
                       physics: const ClampingScrollPhysics(),
                       itemCount: processingTicketProvider
@@ -259,6 +269,7 @@ class _MapViewState extends State<MapView> {
                             .getProcessingTickets()[index];
                         return GestureDetector(
                           onTap: () {
+                            setState(() => mapOptHidden = false);
                             double latitude =
                                 double.parse(ticketModel.client!.latitude);
                             double longitude =
@@ -266,9 +277,10 @@ class _MapViewState extends State<MapView> {
                             _goToLocation(latitude, longitude);
                           },
                           child: Container(
-                            height: 40,
-                            margin: const EdgeInsets.all(5),
+                            height: 48,
+                            margin: const EdgeInsets.all(12),
                             width: getPhoneWitdth(context),
+                            padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 5),
                             decoration: BoxDecoration(
                                 color: Colors.grey[200],
                                 borderRadius: BorderRadius.circular(5)),

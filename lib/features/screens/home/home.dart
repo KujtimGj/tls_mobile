@@ -1,9 +1,15 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tls/core/api.dart';
+import 'package:tls/features/controllers/login_controller.dart';
+import 'package:tls/features/controllers/notification_controllers.dart';
 import 'package:tls/features/controllers/ticket_controllers.dart';
+import 'package:tls/features/providers/finished_tickets_provider.dart';
 import 'package:tls/features/providers/processing_tickets_provider.dart';
 import 'package:tls/features/providers/ticket_provider.dart';
 import 'package:tls/features/providers/user_provider.dart';
+import 'package:tls/features/screens/home/tickets/finished_tickets.dart';
 import 'package:tls/features/screens/home/tickets/processing_tickets.dart';
 import 'package:tls/features/screens/home/tickets/waiting_tickets.dart';
 
@@ -15,27 +21,60 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  List<Widget> _tickets = [];
+  bool pendingTicketLoading = false;
+  bool processingTicketLoading = false;
+  bool finishedTicketLoading = false;
+
   getPendingTickets() async {
     var provider = Provider.of<TicketProvider>(context, listen: false);
 
     TicketControllers ticketControllers = TicketControllers();
+    setState(() => pendingTicketLoading = true);
     var res = await ticketControllers.getPendingTickets(context);
-    res.fold((failure) {}, (tickets) {
+    res.fold((failure) {
+      setState(() => pendingTicketLoading = false);
+    }, (tickets) {
+      setState(() => pendingTicketLoading = false);
       provider.addTickets(tickets);
     });
   }
 
   getProcessingTickets() async {
     var provider =
-    Provider.of<ProcessingTicketsProvider>(context, listen: false);
+        Provider.of<ProcessingTicketsProvider>(context, listen: false);
 
     TicketControllers ticketControllers = TicketControllers();
+    setState(() => processingTicketLoading = true);
     var res = await ticketControllers.getProcessingTickets(context);
     res.fold((failure) {
+      setState(() => processingTicketLoading = false);
       print(failure);
     }, (tickets) {
+      setState(() => processingTicketLoading = false);
       provider.addTickets(tickets);
     });
+  }
+
+  getFinishedTickets() async {
+    var provider =
+        Provider.of<FinishedTicketsProvider>(context, listen: false);
+
+    TicketControllers ticketControllers = TicketControllers();
+    setState(() => finishedTicketLoading = true);
+    var res = await ticketControllers.getFinishedTickets(context);
+    res.fold((failure) {
+      setState(() => finishedTicketLoading = false);
+    }, (tickets) {
+      setState(() => finishedTicketLoading = false);
+      provider.addTickets(tickets);
+    });
+  }
+
+  updateFCMToken() async {
+    LoginController loginController = LoginController();
+    loginController.updateFCMToken(
+        context, await FirebaseMessaging.instance.getToken());
   }
 
   @override
@@ -43,15 +82,22 @@ class _HomeState extends State<Home> {
     super.initState();
     getPendingTickets();
     getProcessingTickets();
+    getFinishedTickets();
+    WidgetsBinding.instance.addPostFrameCallback((callback) {
+      updateFCMToken();
+      getNotifications();
+    });
+
+  }
+
+  getNotifications() {
+    NotificationControllers notificationControllers = NotificationControllers();
+    notificationControllers.getNotifications(context);
   }
 
   int selectedIndex = 0;
 
-  final List<Widget> _tickets = [
-    const WaitingTickets(),
-    const ProcessingTickets(),
-    const ProcessingTickets(),
-  ];
+
 
   @override
   Widget build(BuildContext context) {
@@ -59,9 +105,15 @@ class _HomeState extends State<Home> {
     var ticketProvider = Provider.of<TicketProvider>(context);
     var processingTicketProvider =
         Provider.of<ProcessingTicketsProvider>(context);
+    var finishedTicketProvider =
+        Provider.of<FinishedTicketsProvider>(context);
 
     var user = userProvider.getUser();
-
+    _tickets = [
+      WaitingTickets(loading: pendingTicketLoading,),
+      ProcessingTickets(loading: processingTicketLoading,),
+      FinishedTickets(loading: finishedTicketLoading,),
+    ];
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -70,7 +122,7 @@ class _HomeState extends State<Home> {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if(user!=null)Text("Hi ${userProvider.getUser()!.fullname}"),
+            if (user != null) Text("Hi ${userProvider.getUser()!.fullname}"),
             const Text(
               "Your task list for today",
               style: TextStyle(fontSize: 13, color: Color(0xff909090)),
@@ -93,7 +145,7 @@ class _HomeState extends State<Home> {
         child: RefreshIndicator(
           onRefresh: () async {
             getPendingTickets();
-            getProcessingTickets();
+            getFinishedTickets();
           },
           child: ListView(
             children: [
@@ -123,21 +175,13 @@ class _HomeState extends State<Home> {
                             const SizedBox(
                               height: 10,
                             ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "Waiting",
-                                      style: TextStyle(
-                                          fontSize: 18,
-                                          color: Colors.grey[500]),
-                                    )
-                                  ],
-                                ),
-                              ],
+                            FittedBox(
+                              child: Text(
+                                "Waiting",
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.grey[500]),
+                              ),
                             ),
                           ],
                         ),
@@ -171,21 +215,13 @@ class _HomeState extends State<Home> {
                             const SizedBox(
                               height: 10,
                             ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "In process",
-                                      style: TextStyle(
-                                          fontSize: 18,
-                                          color: Colors.grey[500]),
-                                    )
-                                  ],
-                                ),
-                              ],
+                            FittedBox(
+                              child: Text(
+                                "In process",
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.grey[500]),
+                              ),
                             ),
                           ],
                         ),
@@ -211,29 +247,21 @@ class _HomeState extends State<Home> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              "0",
-                              style: TextStyle(
+                              Text(
+                              "${finishedTicketProvider.getFinishedTickets().length}",
+                              style: const TextStyle(
                                   fontSize: 30, fontWeight: FontWeight.w400),
                             ),
                             const SizedBox(
                               height: 10,
                             ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "Finished",
-                                      style: TextStyle(
-                                          fontSize: 18,
-                                          color: Colors.grey[500]),
-                                    )
-                                  ],
-                                ),
-                              ],
+                            FittedBox(
+                              child: Text(
+                                "Finished",
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.grey[500]),
+                              ),
                             ),
                           ],
                         ),

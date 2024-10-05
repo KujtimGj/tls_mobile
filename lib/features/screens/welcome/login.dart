@@ -123,7 +123,7 @@ class _LoginState extends State<Login> {
               ),
               const SizedBox(height: 15),
               const Text(
-                "Forgot passowrd?",
+                "Forgot password?",
                 style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
               )
             ],

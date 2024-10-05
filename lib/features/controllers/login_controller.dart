@@ -57,7 +57,24 @@ class LoginController{
     else{
       return Left(ServerFailure());
     }
+  }
 
-
+  Future<Either<Failure,dynamic>> updateFCMToken(BuildContext context, String? fcmToken) async {
+    var userProvider = Provider.of<UserProvider>(context,listen: false);
+    Uri url = Uri.parse("$host$fcmtokenRoute");
+    var body = jsonEncode({
+      'fcmToken': fcmToken,
+      'userId': userProvider.getUser()!.id,
+    });
+    var response = await http.put(headers: requestHeaders, url,body: body);
+    if(response.statusCode == 200) {
+      return const Right("");
+    }
+    else if(response.statusCode == 401){
+      return Left(WrongDataFailure(message: "Email or password is incorrect!"));
+    }
+    else{
+      return Left(ServerFailure());
+    }
   }
 }

@@ -20,8 +20,8 @@ class TicketModel {
   List<dynamic>? technicians;
   bool? completed;
   bool? deleted;
-  String? createdAt;
-  String? updatedAt;
+  DateTime? createdAt;
+  DateTime? updatedAt;
   int? ticketNumber;
   int? products;
   int? v;
@@ -51,24 +51,25 @@ class TicketModel {
   });
 
   factory TicketModel.fromJson(Map<String, dynamic> json) {
-    print("json['images']: ${json['images']}");
     return TicketModel(
       id: json['_id'],
       addedBy: json['added_by'],
       clientCompany: json['client_company'],
-      serviceCompany: ServiceCompany.fromJson(json['service_company']),
-      client: Client.fromJson(json['client']),
+      serviceCompany: json['service_company'] != null
+          ? ServiceCompany.fromJson(json['service_company'])
+          : null,
+      client: json['client'] != null ? Client.fromJson(json['client']) : null,
       body: json['data'],
       status: json['status'],
       servicePrice: json['service_price'],
       discountPrice: json['discount_price'] != null ? json['discount_price'] : 0,
       hasDiscount: json['has_discount'],
-      images: StorageModel.fromJson(json['images']),
-      technicians: json['technicians'],
+      images: json['images'] != null ? StorageModel.fromJson(json['images']) : null,
+      technicians: json['technicians'] != null ? List<dynamic>.from(json['technicians']) : [],
       completed: json['completed'],
       deleted: json['deleted'],
-      createdAt: json['createdAt'],
-      updatedAt: json['updatedAt'],
+      createdAt: json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
+      updatedAt: json['updatedAt'] != null ? DateTime.parse(json['updatedAt']) : null,
       ticketNumber: json['ticket_number'],
       products: json['products'],
       v: json['__v'],
@@ -81,19 +82,19 @@ class TicketModel {
       '_id': id,
       'added_by': addedBy,
       'client_company': clientCompany,
-      'service_company': serviceCompany!.toJson(),
-      'client': client!.toJson(),
+      'service_company': serviceCompany?.toJson(),
+      'client': client?.toJson(),
       'data': body,
       'status': status,
       'service_price': servicePrice,
       'discount_price': discountPrice,
       'has_discount': hasDiscount,
-      'images': images!.toJson(),
+      'images': images?.toJson(),
       'technicians': technicians,
       'completed': completed,
       'deleted': deleted,
-      'createdAt': createdAt,
-      'updatedAt': updatedAt,
+      'createdAt': createdAt?.toIso8601String(),
+      'updatedAt': updatedAt?.toIso8601String(),
       'ticket_number': ticketNumber,
       'products': products,
       '__v': v,
@@ -101,5 +102,3 @@ class TicketModel {
     };
   }
 }
-
-

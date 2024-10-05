@@ -1083,128 +1083,133 @@ class _GeneralBodyState extends State<GeneralBody> {
         const SizedBox(
           height: 15,
         ),
-        const Text(
-          "Client Satisfaction",
-          style: TextStyle(),
-        ),
-        const SizedBox(
-          height: 8,
-        ),
-        Wrap(
+
+        widget.ticketModel!.status != "processing" ? SizedBox():Column(
           children: [
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  clientSatisfaction.text = "Very Satisfied";
-                  widget.clientSatisfaction!(clientSatisfaction.text);
-                });
-              },
-              child: Container(
-                width: getPhoneWitdth(context),
-                height: 40,
-                color: Colors.transparent,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      "Very Satisfied",
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    Container(
-                      width: 21,
-                      height: 21,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(100),
-                          border: Border.all(color: Colors.black87)),
-                      padding: const EdgeInsets.all(3),
-                      child: clientSatisfaction.text != "Very Satisfied"
-                          ? const SizedBox()
-                          : Container(
-                              width: 21,
-                              height: 21,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(100),
-                                  color: Colors.black87)),
-                    ),
-                  ],
-                ),
-              ),
+            const Text(
+              "Client Satisfaction",
+              style: TextStyle(),
             ),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  clientSatisfaction.text = "Satisfied";
-                  widget.clientSatisfaction!(clientSatisfaction.text);
-                });
-              },
-              child: Container(
-                width: getPhoneWitdth(context),
-                height: 40,
-                color: Colors.transparent,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      "Satisfied",
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    Container(
-                      width: 21,
-                      height: 21,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(100),
-                          border: Border.all(color: Colors.black87)),
-                      padding: const EdgeInsets.all(3),
-                      child: clientSatisfaction.text != "Satisfied"
-                          ? const SizedBox()
-                          : Container(
-                              width: 21,
-                              height: 21,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(100),
-                                  color: Colors.black87)),
-                    ),
-                  ],
-                ),
-              ),
+            const SizedBox(
+              height: 8,
             ),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  clientSatisfaction.text = "Not Satisfied";
-                  widget.clientSatisfaction!(clientSatisfaction.text);
-                });
-              },
-              child: Container(
-                width: getPhoneWitdth(context),
-                height: 40,
-                color: Colors.transparent,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      "Not Satisfied",
-                      style: TextStyle(fontSize: 16),
+            Wrap(
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      clientSatisfaction.text = "Very Satisfied";
+                      widget.clientSatisfaction!(clientSatisfaction.text);
+                    });
+                  },
+                  child: Container(
+                    width: getPhoneWitdth(context),
+                    height: 40,
+                    color: Colors.transparent,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          "Very Satisfied",
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        Container(
+                          width: 21,
+                          height: 21,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(100),
+                              border: Border.all(color: Colors.black87)),
+                          padding: const EdgeInsets.all(3),
+                          child: clientSatisfaction.text != "Very Satisfied"
+                              ? const SizedBox()
+                              : Container(
+                                  width: 21,
+                                  height: 21,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(100),
+                                      color: Colors.black87)),
+                        ),
+                      ],
                     ),
-                    Container(
-                      width: 21,
-                      height: 21,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(100),
-                          border: Border.all(color: Colors.black87)),
-                      padding: const EdgeInsets.all(3),
-                      child: clientSatisfaction.text != "Not Satisfied"
-                          ? const SizedBox()
-                          : Container(
-                              width: 21,
-                              height: 21,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(100),
-                                  color: Colors.black87)),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      clientSatisfaction.text = "Satisfied";
+                      widget.clientSatisfaction!(clientSatisfaction.text);
+                    });
+                  },
+                  child: Container(
+                    width: getPhoneWitdth(context),
+                    height: 40,
+                    color: Colors.transparent,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          "Satisfied",
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        Container(
+                          width: 21,
+                          height: 21,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(100),
+                              border: Border.all(color: Colors.black87)),
+                          padding: const EdgeInsets.all(3),
+                          child: clientSatisfaction.text != "Satisfied"
+                              ? const SizedBox()
+                              : Container(
+                                  width: 21,
+                                  height: 21,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(100),
+                                      color: Colors.black87)),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      clientSatisfaction.text = "Not Satisfied";
+                      widget.clientSatisfaction!(clientSatisfaction.text);
+                    });
+                  },
+                  child: Container(
+                    width: getPhoneWitdth(context),
+                    height: 40,
+                    color: Colors.transparent,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          "Not Satisfied",
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        Container(
+                          width: 21,
+                          height: 21,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(100),
+                              border: Border.all(color: Colors.black87)),
+                          padding: const EdgeInsets.all(3),
+                          child: clientSatisfaction.text != "Not Satisfied"
+                              ? const SizedBox()
+                              : Container(
+                                  width: 21,
+                                  height: 21,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(100),
+                                      color: Colors.black87)),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

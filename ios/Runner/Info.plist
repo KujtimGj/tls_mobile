@@ -27,13 +27,21 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>We need access to your camera to allow you to take photos and videos.</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>We need access to your microphone to record audio with your videos.</string>
+	<string>Camera is required to take photo of completed task guarantee.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Location is required to location to get current employee location.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Location is required to access client location when service is required.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>We need access to your photo library to allow you to select and upload photos.</string>
+	<string>Gallery images are required to get images of completed tasks.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>processing</string>
+		<string>remote-notification</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

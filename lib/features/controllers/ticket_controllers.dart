@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:dartz/dartz.dart';
+import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:tls/core/api.dart';
@@ -13,7 +15,7 @@ import 'package:tls/features/providers/user_provider.dart';
 
 class TicketControllers {
   static Map<String, String> requestHeaders = {
-    'Content-type': 'application/json'
+    'Content-Type': 'application/json'
   };
 
   Future<Either<Failure, List<TicketModel>>> getPendingTickets(
@@ -23,7 +25,7 @@ class TicketControllers {
     requestHeaders['userID'] = userProvider.getUser()!.id;
 
     var response = await http.get(url, headers: requestHeaders);
-    print(response.body);
+
 
     if (response.statusCode == 200) {
       var body = jsonDecode(response.body);
@@ -53,6 +55,32 @@ class TicketControllers {
 
       return Right(tickets);
     } else {
+      return Left(ServerFailure());
+    }
+  }
+
+  Future<Either<Failure, List<TicketModel>>> getFinishedTickets(
+      BuildContext context) async {
+    var userProvider = Provider.of<UserProvider>(context, listen: false);
+    Uri url = Uri.parse("$host$finishedTicketsRoute");
+    requestHeaders['userID'] = userProvider.getUser()!.id;
+
+    try{
+      var response = await http.get(url, headers: requestHeaders);
+      print(response.body);
+      if (response.statusCode == 200) {
+        var body = jsonDecode(response.body);
+        List<TicketModel> tickets = body['tickets']
+            .map<TicketModel>((json) => TicketModel.fromJson(json))
+            .toList();
+
+        return Right(tickets);
+      } else {
+        return Left(ServerFailure());
+      }
+    }
+    catch(e){
+      showToast(context: context,"Ka ndodhur nje problem\nJu lutem kontrolloni lidhje me rrjet!");
       return Left(ServerFailure());
     }
   }
@@ -114,21 +142,49 @@ class TicketControllers {
     }
   }
 
+
   Future<Either<Failure, bool>> completeTicket(
-      BuildContext context, String id, var body) async {
+      BuildContext context, String id, var body, File signature) async {
+
     var userProvider = Provider.of<UserProvider>(context, listen: false);
     Uri url = Uri.parse("$host$completeTicketRoute/$id");
-    requestHeaders['userID'] = userProvider.getUser()!.id;
-    print("body: ${jsonEncode(body)}");
-    var response =
-        await http.put(url, body: jsonEncode(body), headers: requestHeaders);
-    print("response.body: ${response.body}");
-    if (response.statusCode == 200) {
+
+    // Create a multipart request
+    var request = http.MultipartRequest('PUT', url);
+
+    // Add the signature file
+    if (signature != null) {
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'signature', // field name for the file
+          signature.path,
+        ),
+      );
+    }
+
+    // Add the headers
+    request.headers.addAll(requestHeaders);
+    request.headers['userID'] = userProvider.getUser()!.id;
+
+    // Add the JSON body as a field
+    request.fields['body'] = jsonEncode(body);
+
+    // Send the request
+    var response = await request.send();
+
+    // Convert the response to a regular HTTP response
+    var responseData = await http.Response.fromStream(response);
+
+    print("response.body: ${responseData.statusCode}");
+    print("response.body: ${responseData.body}");
+
+    if (responseData.statusCode == 200) {
       return const Right(true);
     } else {
       return Left(ServerFailure());
     }
   }
+
 
   Future<Either<Failure, List<TicketProductModel>>> getProducts(
       BuildContext context, String ticketId) async {

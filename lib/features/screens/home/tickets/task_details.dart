@@ -1,10 +1,11 @@
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:signature/signature.dart';
 import 'package:tls/core/dimensions.dart';
 import 'package:tls/core/utils.dart';
 import 'package:tls/features/controllers/ticket_controllers.dart';
@@ -28,7 +29,15 @@ class TaskDetails extends StatefulWidget {
 }
 
 class _TaskDetailsState extends State<TaskDetails> {
-  TextEditingController _comment = TextEditingController();
+  // Initialise a controller. It will contains signature points, stroke width and pen color.
+// It will allow you to interact with the widget
+  SignatureController _controller = SignatureController(
+    penStrokeWidth: 3,
+    penColor: Colors.red,
+    exportBackgroundColor: Colors.grey[200],
+  );
+
+  final TextEditingController _comment = TextEditingController();
 
   /// PickUp Fields
   TextEditingController inverterUsed = TextEditingController();
@@ -50,23 +59,27 @@ class _TaskDetailsState extends State<TaskDetails> {
   /// General Fields
   TextEditingController clientSatisfaction = TextEditingController();
 
-  bool loading = false;
+  bool rejecting = false;
+  bool returning = false;
+  bool completing = false;
+  bool accepting = false;
 
   List<XFile> beforeFiles = [];
   List<XFile> afterFiles = [];
+  File? signatureFle;
 
   acceptTicket() async {
-    setState(() => loading = true);
     var waitingProvider = Provider.of<TicketProvider>(context, listen: false);
     var provider =
         Provider.of<ProcessingTicketsProvider>(context, listen: false);
     TicketControllers ticketControllers = TicketControllers();
+    setState(() => accepting = true);
     var res = await ticketControllers.ticketOnProcess(
         context, widget.ticketModel!.id!);
     res.fold((failure) {
-      setState(() => loading = false);
+      setState(() => accepting = false);
     }, (tickets) {
-      setState(() => loading = false);
+      setState(() => accepting = false);
       provider.addTicket(widget.ticketModel!);
       waitingProvider.removeTicket(widget.ticketModel!);
       Navigator.pop(context);
@@ -75,17 +88,17 @@ class _TaskDetailsState extends State<TaskDetails> {
   }
 
   rejectTicket() async {
-    setState(() => loading = true);
     var provider =
         Provider.of<ProcessingTicketsProvider>(context, listen: false);
     TicketControllers ticketControllers = TicketControllers();
+    setState(() => rejecting = true);
     var res = await ticketControllers.rejectTicket(
         context, widget.ticketModel!.id!, _comment.text);
     res.fold((failure) {
-      setState(() => loading = false);
+      setState(() => rejecting = false);
     }, (tickets) {
       _comment.text = "";
-      setState(() => loading = false);
+      setState(() => rejecting = false);
       provider.removeTicket(widget.ticketModel!);
       Navigator.pop(context);
       Fluttertoast.showToast(msg: "Ticket rejected successfully");
@@ -93,17 +106,17 @@ class _TaskDetailsState extends State<TaskDetails> {
   }
 
   returnTicket() async {
-    setState(() => loading = true);
     var provider =
         Provider.of<ProcessingTicketsProvider>(context, listen: false);
     TicketControllers ticketControllers = TicketControllers();
+    setState(() => returning = true);
     var res = await ticketControllers.returnTicket(
         context, widget.ticketModel!.id!, _comment.text);
     res.fold((failure) {
-      setState(() => loading = false);
+      setState(() => returning = false);
     }, (tickets) {
       _comment.text = "";
-      setState(() => loading = false);
+      setState(() => returning = false);
       provider.addTicket(widget.ticketModel!);
       Navigator.pop(context);
       Fluttertoast.showToast(msg: "Ticket returned successfully");
@@ -114,7 +127,6 @@ class _TaskDetailsState extends State<TaskDetails> {
     var body = {};
 
     if (widget.ticketModel!.body['ticketmodel'] == "PickUp") {
-      print("sdfsdf");
       body['installationDate'] = installationDate.text;
       body['inverterUsed'] = inverterUsed.text;
       body['isOperational'] = operationOn;
@@ -134,18 +146,26 @@ class _TaskDetailsState extends State<TaskDetails> {
       body['assembled'] = assembled;
     }
 
-    setState(() => loading = true);
+    // EXPORT BYTES AS PNG
+// The exported image will be limited to the drawn area
+    Uint8List? uint8List = await  _controller.toPngBytes();
+
+      signatureFle = await convertUint8ListToFile(uint8List!);
+    setState(() {});
+
+
     var provider =
         Provider.of<ProcessingTicketsProvider>(context, listen: false);
     TicketControllers ticketControllers = TicketControllers();
+    setState(() => completing = true);
     var res = await ticketControllers.completeTicket(
-        context, widget.ticketModel!.id!, body);
+        context, widget.ticketModel!.id!, body, signatureFle!);
     res.fold((failure) {
-      setState(() => loading = false);
+      setState(() => completing = false);
     }, (tickets) {
       _comment.text = "";
-      setState(() => loading = false);
-      // provider.addTicket(widget.ticketModel!);
+      setState(() => completing = false);
+      provider.addTicket(widget.ticketModel!);
       Navigator.pop(context);
       Fluttertoast.showToast(msg: "Ticket completed successfully");
     });
@@ -174,7 +194,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                     minLines: 3,
                     maxLines: 7,
                     decoration: InputDecoration(
-                      enabled: false,
+                        enabled: false,
                         hintText: "Reason here...",
                         border: InputBorder.none,
                         enabledBorder: OutlineInputBorder(
@@ -294,6 +314,13 @@ class _TaskDetailsState extends State<TaskDetails> {
         });
   }
 
+//DONT FORGET TO DISPOSE IT IN THE `dispose()` METHOD OF STATEFUL WIDGETS
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -327,7 +354,7 @@ class _TaskDetailsState extends State<TaskDetails> {
               if (widget.ticketModel!.client!.latitude.isEmpty ||
                   widget.ticketModel!.client!.longitude.isEmpty) {
                 Fluttertoast.showToast(
-                    msg: "Latitude or longditute is missing!");
+                    msg: "Latitude or longitude is missing!");
               } else {
                 try {
                   var url = getMapDirectionUrl(
@@ -336,7 +363,11 @@ class _TaskDetailsState extends State<TaskDetails> {
                   if (!await launchUrl(url)) {
                     throw Exception('Could not launch $url');
                   }
-                } catch (e) {}
+                } catch (e) {
+                  if (kDebugMode) {
+                    print(e);
+                  }
+                }
               }
             },
             child: Container(
@@ -475,8 +506,32 @@ class _TaskDetailsState extends State<TaskDetails> {
                 height: 30,
                 thickness: 0.6,
               ),
-              bodyNavigation(widget!.ticketModel!.body),
-              const SizedBox(height: 25),
+              bodyNavigation(widget.ticketModel!.body),
+
+              signatureFle == null ? const SizedBox():Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Client Signature",
+                    style: TextStyle(
+                        fontSize: 17, fontWeight: FontWeight.w500),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Container(
+                    width: getPhoneWitdth(context),
+                    height: 250,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                        image: DecorationImage(
+                            image: FileImage(signatureFle!)
+                        )
+                    ),
+                  ),
+                  const SizedBox(height: 25),
+                ],
+              ),
               nextButton(size),
               const SizedBox(height: 25),
             ],
@@ -493,7 +548,7 @@ class _TaskDetailsState extends State<TaskDetails> {
           showModalBottomSheet(
               backgroundColor: Colors.transparent,
               context: context,
-              builder: (contect) {
+              builder: (context) {
                 return Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
@@ -571,7 +626,8 @@ class _TaskDetailsState extends State<TaskDetails> {
                               ),
                             )
                           ],
-                        )
+                        ),
+
                       ],
                     ),
                   ),
@@ -589,7 +645,7 @@ class _TaskDetailsState extends State<TaskDetails> {
               color: const Color(0xff58dc6b),
               borderRadius: BorderRadius.circular(10)),
           child: Center(
-            child: loading
+            child: accepting
                 ? const CircularProgressIndicator(
                     strokeWidth: 1.8,
                     color: Colors.white,
@@ -601,7 +657,7 @@ class _TaskDetailsState extends State<TaskDetails> {
           ),
         ),
       );
-    } else {
+    } else if (widget.ticketModel!.status == "processing") {
       return Row(
         children: [
           Expanded(
@@ -620,7 +676,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                     color: const Color(0xffe73d4f),
                     borderRadius: BorderRadius.circular(10)),
                 child: Center(
-                  child: loading
+                  child: rejecting
                       ? const CircularProgressIndicator(
                           strokeWidth: 1.8,
                           color: Colors.white,
@@ -651,7 +707,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                     color: const Color(0xff357ee5),
                     borderRadius: BorderRadius.circular(10)),
                 child: Center(
-                  child: loading
+                  child: returning
                       ? const CircularProgressIndicator(
                           strokeWidth: 1.8,
                           color: Colors.white,
@@ -670,7 +726,135 @@ class _TaskDetailsState extends State<TaskDetails> {
           Expanded(
             child: GestureDetector(
               onTap: () {
-                completeTicket();
+
+                  print(_controller.isNotEmpty);
+                if(_controller.isNotEmpty){
+                  var exportedPoints = _controller.points;
+
+//EXPORTED POINTS CAN BE USED TO INITIALIZE PREVIOUS CONTROLLER
+                  _controller = SignatureController(points: exportedPoints);
+                  setState(() {
+
+                  });
+                }
+                showModalBottomSheet(
+                    context: context,
+                    builder: (context) {
+
+                      // EXPORT POINTS (2D POINTS ROUGHLY REPRESENTING WHAT IS VISIBLE ON CANVAS)
+
+                      return StatefulBuilder(builder: (context, setter) {
+                        return Container(
+                          width: getPhoneWitdth(context),
+                          height: getPhoneHeight(context) / 2,
+                          child: Column(
+                            children: [
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              const Text(
+                                "Client Signature",
+                                style: TextStyle(
+                                    fontSize: 20, fontWeight: FontWeight.w500),
+                              ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              Signature(
+                                controller: _controller,
+                                width: getPhoneWitdth(context),
+                                height: 250,
+                                backgroundColor: Colors.grey[400]!,
+                              ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 15),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: Container(
+                                        width: getPhoneWitdth(context) / 3 - 30,
+                                        height: 45,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            color: Colors.grey[400]),
+                                        child: const Center(
+                                          child: Text(
+                                            "Exit",
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.w500,
+                                                color: Colors.black54),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    GestureDetector(
+                                      onTap: () {
+                                        setter(() {
+                                          _controller.clear();
+                                        });
+                                      },
+                                      child: Container(
+                                        width: getPhoneWitdth(context) / 3 - 30,
+                                        height: 45,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            color: Colors.grey[400]),
+                                        child: const Center(
+                                          child: Text(
+                                            "Clear",
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.w500,
+                                                color: Colors.black54),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    GestureDetector(
+                                      onTap: () {
+                                        if(_controller.isEmpty) return;
+                                        Navigator.pop(context);
+                                        completeTicket();
+                                      },
+                                      child: Container(
+                                        width: getPhoneWitdth(context) / 3 - 30,
+                                        height: 45,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            color: Colors.grey[400]),
+                                        child: const Center(
+                                          child: Text(
+                                            "Continue",
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.w500,
+                                                color: Colors.black54),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
+                        );
+                      });
+                    });
+
                 // acceptTicket();
                 // Navigator.push(
                 //     context,
@@ -683,7 +867,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                     color: const Color(0xff156443),
                     borderRadius: BorderRadius.circular(10)),
                 child: Center(
-                  child: loading
+                  child: completing
                       ? const CircularProgressIndicator(
                           strokeWidth: 1.8,
                           color: Colors.white,
@@ -699,26 +883,31 @@ class _TaskDetailsState extends State<TaskDetails> {
         ],
       );
     }
+    else{
+      return SizedBox();
+    }
   }
 
   bodyNavigation(body) {
-    print(body);
     if (body['ticketmodel'] == "General") {
       return GeneralBody(
-          ticketModel: widget.ticketModel,
-          generalTicketData: GeneralTicketData.fromJson(body),
-      clientSatisfaction: (value){
-        clientSatisfaction.text = value;
-        setState(() {});
-      },
+        ticketModel: widget.ticketModel,
+        generalTicketData: GeneralTicketData.fromJson(body),
+        clientSatisfaction: (value) {
+          clientSatisfaction.text = value;
+          setState(() {});
+        },
       );
     } else if (body['ticketmodel'] == "Repair") {
       return RepairBody(
         ticketModel: widget.ticketModel,
         repairTicketData: RepairTicketData.fromJson(body),
-        conductorResistance: (value) => setState(() => conductorResistance.text = value),
-        insulationResistance: (value) => setState(() => insulationResistance.text = value),
-        differentialCurrent: (value) => setState(() => differentialCurrent.text = value),
+        conductorResistance: (value) =>
+            setState(() => conductorResistance.text = value),
+        insulationResistance: (value) =>
+            setState(() => insulationResistance.text = value),
+        differentialCurrent: (value) =>
+            setState(() => differentialCurrent.text = value),
         isDamaged: (value) => isDamaged = value,
         hasGuarantee: (value) => setState(() => hasGuarantee = value),
         tested: (value) => isFunctional = value,

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:tls/features/controllers/ticket_controllers.dart';
 import 'package:tls/features/models/ticket_model.dart';
@@ -8,7 +9,8 @@ import 'package:tls/features/providers/ticket_provider.dart';
 import 'package:tls/features/screens/home/tickets/task_details.dart';
 
 class ProcessingTickets extends StatefulWidget {
-  const ProcessingTickets({super.key});
+  final bool? loading;
+  const ProcessingTickets({super.key, required this.loading});
 
   @override
   State<ProcessingTickets> createState() => _ProcessingTicketsState();
@@ -31,7 +33,7 @@ class _ProcessingTicketsState extends State<ProcessingTickets> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     var processingTicketProvider = Provider.of<ProcessingTicketsProvider>(context);
-    return ListView.builder(
+    return widget.loading == true ? Center(child: CircularProgressIndicator(strokeWidth: 1.6,),):ListView.builder(
       shrinkWrap: true,
       physics: const ClampingScrollPhysics(),
       itemBuilder: (context, index) {
@@ -132,10 +134,11 @@ class _ProcessingTicketsState extends State<ProcessingTickets> {
 
                             borderRadius: BorderRadius.circular(15)),
 
-                        child: const Row(
+                        child:   Row(
                           children: [
                             Icon(Icons.timelapse),
-                            Text(" 20 Jan")
+                            SizedBox(width: 10,),
+                            Text("${DateFormat('dd MMM yyyy').format(ticketModel.createdAt!)}")
                           ],
                         ),
                       ),

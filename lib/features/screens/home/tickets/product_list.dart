@@ -75,7 +75,7 @@ class _ProductListState extends State<ProductList> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text("Title",style: TextStyle(fontSize: 13,color: Colors.grey[700]),),
-                              Text(product.product.productTitle),
+                              Text(product.product.productTitle ?? ""),
                             ],
                           ),
                         ),

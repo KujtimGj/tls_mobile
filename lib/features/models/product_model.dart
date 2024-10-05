@@ -1,40 +1,44 @@
 class Product {
   String? id;
-  String productCode;
-  String productTitle;
-  String productModel;
-  double productPrice;
-  int productAmount;
+  String? productCode;
+  String? productTitle;
+  String? productModel;
+  double? productPrice;
+  int? productAmount;
   String? description;
-  bool sold;
-  bool active;
-  bool deleted;
-  String productCategory;
-  String clientCompany;
+  bool? sold;
+  bool? active;
+  bool? deleted;
+  String? productCategory;
+  String? clientCompany;
   DateTime? createdAt;
   DateTime? updatedAt;
 
   Product({
     this.id,
-    required this.productCode,
-    required this.productTitle,
-    required this.productModel,
-    required this.productPrice,
-    required this.productAmount,
+      this.productCode,
+      this.productTitle,
+      this.productModel,
+      this.productPrice,
+      this.productAmount,
     this.description,
     this.sold = false,
     this.active = true,
     this.deleted = false,
-    required this.productCategory,
-    required this.clientCompany,
+      this.productCategory,
+      this.clientCompany,
     this.createdAt,
     this.updatedAt,
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
+  ;
+    if(json['product_code'] == null){
+      return Product();
+    }
     return Product(
       id: json['_id'],
-      productCode: json['product_code'],
+      productCode: json['product_code'] == null ? null :json['product_code'],
       productTitle: json['product_title'],
       productModel: json['product_model'],
       productPrice: (json['product_price'] as num).toDouble(),
